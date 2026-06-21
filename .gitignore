@@ -56,5 +56,9 @@ config/weechat/
 !config/weechat/weechat.conf
 !config/weechat/xfer.conf
 
+# halloy
+config/halloy/config.toml
+password.txt
+
 # venv
 .nix-chroot/

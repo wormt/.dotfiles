@@ -1,0 +1,29 @@
+theme = "ayu"
+scale_factor = 1.4
+
+[servers.server]
+nickname = "anon"
+server = "example.com"
+
+[servers.server.sasl.plain]
+username = "anon"
+password_file = "password.txt"
+
+[font]
+size = 12
+line_height = 1.15
+
+[buffer.typing]
+font_size = 12
+
+[buffer.nickname]
+color = "unique"
+
+[buffer.server_messages]
+join.smart = 600
+part.smart = 600
+quit.smart = 600
+change_nick.smart = 600
+
+[notifications]
+direct_message = { sound = "peck", show_toast = true }
