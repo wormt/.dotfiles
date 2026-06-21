@@ -1,0 +1,7 @@
+#!/bin/sh
+if [ ! -z "$(wpa_cli list_networks|rg DISABLED)" ]
+then
+	wpa_cli enable_network *
+else
+	wpa_cli disable_network *
+fi

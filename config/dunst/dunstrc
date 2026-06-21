@@ -1,0 +1,19 @@
+[global]
+width=200
+height=64
+notification_limit=9
+origin=bottom-right
+offset=6x6
+progress_bar=false
+icon_corner_radius=1
+transparency=6
+padding=3
+frame_width=1
+gap_size=6
+font=CozetteVector 11
+corner_radius=0
+max_icon_size=48
+background="#fff"
+foreground="#000"
+frame_color="#ec7fac"
+timeout=0

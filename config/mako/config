@@ -1,0 +1,17 @@
+font=CozetteVector 13
+background-color=#ffffffdf
+text-color=#000000
+border-color=#ec7fac
+progress-color=over #ec7fac
+max-visible=4
+width=192
+height=108
+margin=1
+padding=1
+border-size=1
+border-radius=0
+icons=0
+max-icon-size=48
+anchor=bottom-right
+[mode=dnd]
+invisible=1

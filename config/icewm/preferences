@@ -1,0 +1,123 @@
+DesktopBackgroundImage="~/pic/dump1/changeofheart.png"
+
+TaskBarAtTop=1 # 0/1
+
+TaskBarShowAPMAuto=0 # 0/1
+
+TaskBarShowAPMGraph=0 # 0/1
+
+TaskBarShowCPUStatus=0 # 0/1
+
+TaskBarShowAPMTime=0 # 0/1
+
+TaskBarShowMEMStatus=0 # 0/1
+
+HideBordersMaximized=1 # 0/1
+
+HideTitleBarWhenMaximized=1 # 0/1
+
+AutoRaise=0 # 0/1
+
+PagerShowNumbers=1 # 0/1
+
+
+KeyWinClose="Super+Q"
+
+KeyWinMaximize="Super+F"
+KeyWinMaximizeVert=""
+KeyWinMaximizeHoriz=""
+KeyWinFullscreen="Super+Shift+F"
+KeyWinRollup=""
+KeyWinHide=""
+KeyWinMenu="Super+space"
+
+KeyWinArrangeNW="Super+Print"
+KeyWinArrangeN="Super+Scroll_Lock"
+KeyWinArrangeNE="Super+Pause"
+KeyWinArrangeE="Super+Page_Up"
+KeyWinArrangeSE="Super+Page_Down"
+KeyWinArrangeS="Super+End"
+KeyWinArrangeSW="Super+Delete"
+KeyWinArrangeW="Super+Insert"
+KeyWinArrangeC="Super+Home"
+
+KeyWinTileTopLeft="Super+Shift+Print"
+KeyWinTileTop="Super+Shift+Scroll_Lock"
+KeyWinTileTopRight="Super+Shift+Pause"
+KeyWinTileRight="Super+Shift+Page_Up"
+KeyWinTileBottomRight="Super+Shift+Page_Down"
+KeyWinTileBottom="Super+Shift+End"
+KeyWinTileBottomLeft="Super+Shift+Delete"
+KeyWinTileLeft="Super+Shift+Insert"
+KeyWinTileCenter=""
+KeyWinSmartPlace="Super+Shift+Home"
+
+KeyWinRaise=""
+KeyWinLower=""
+KeyWinOccupyAll="Super+Shift+0"
+KeyWinPrev="Super+K"
+KeyWinNext="Super+J"
+KeyWinMove=""
+KeyWinSize=""
+KeyWinMinimize="Super+D"
+KeyWin="Super+D"
+
+KeySysWinMenu=""
+KeySysWinNext=""
+KeySysWinPrev=""
+KeySysWindowList="Super+grave"
+KeySysAddressBar="Super+Shift+colon"
+KeySysWorkspacePrev="Super+h"
+KeySysWorkspaceNext="Super+l"
+KeySysWorkspaceLast=""
+KeySysWorkspacePrevTakeWin="Super+Shift+h"
+KeySysWorkspaceNextTakeWin="Super+Shift+l"
+KeySysWorkspaceLastTakeWin=""
+
+KeySysWorkspace1="Super+1"
+KeySysWorkspace2="Super+2"
+KeySysWorkspace3="Super+3"
+KeySysWorkspace4="Super+4"
+KeySysWorkspace5="Super+5"
+KeySysWorkspace6="Super+6"
+KeySysWorkspace7="Super+7"
+KeySysWorkspace8="Super+8"
+KeySysWorkspace9="Super+9"
+KeySysWorkspace10=""
+KeySysWorkspace11=""
+KeySysWorkspace12=""
+
+KeySysWorkspace1TakeWin="Super+Shift+1"
+KeySysWorkspace2TakeWin="Super+Shift+2"
+KeySysWorkspace3TakeWin="Super+Shift+3"
+KeySysWorkspace4TakeWin="Super+Shift+4"
+KeySysWorkspace5TakeWin="Super+Shift+5"
+KeySysWorkspace6TakeWin="Super+Shift+6"
+KeySysWorkspace7TakeWin="Super+Shift+7"
+KeySysWorkspace8TakeWin="Super+Shift+8"
+KeySysWorkspace9TakeWin="Super+Shift+9"
+KeySysWorkspace10TakeWin=""
+KeySysWorkspace11TakeWin=""
+KeySysWorkspace12TakeWin=""
+
+KeySysTileVertical=""
+KeySysTileHorizontal=""
+KeySysCascade=""
+KeySysArrange="Super+Ctrl+Home"
+KeySysUndoArrange="Super+Ctrl+Shift+Home"
+KeySysArrangeIcons=""
+KeySysMinimizeAll=""
+KeySysHideAll=""
+KeySysShowDesktop=""
+KeySysCollapseTaskBar="Super+Alt+F"
+
+MouseWinMove="Super+Pointer_Button1"
+MouseWinSize="Super+Pointer_Button3"
+
+MouseWinTabbing="Shift+Pointer_Button2"
+
+TerminalCommand="mlterm"
+
+Win95Keys=0 # 0/1
+
+TaskBarShowMailboxStatus=0 # 0/1

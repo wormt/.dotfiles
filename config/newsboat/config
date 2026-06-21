@@ -1,0 +1,30 @@
+browser "wl-copy %u"
+macro q set browser "exec qutebrowser %u&"; open-in-browser-noninteractively; set browser "wl-copy %u"
+macro m set browser "exec mpv $(echo %u|sed 's/invidious.materialio.us/www.youtube.com/')&"; open-in-browser-noninteractively; set browser "wl-copy %u"
+macro s set browser "exec echo %u|sed 's/invidious.materialio.us/www.youtube.com/'|wl-copy"; open-in-browser-noninteractively; set browser "wl-copy %u"
+external-url-viewer "urlview"
+confirm-mark-feed-read no
+display-article-progress no
+max-items 256
+download-timeout 4
+download-full-page yes
+always-display-description yes
+user-agent "Mozilla/5.0 (Windows NT 11.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.3"
+reload-threads 4
+unbind-key A
+bind-key a mark-feed-read
+unbind-key C
+bind-key c mark-all-feeds-read
+show-keymap-hint no
+color background          default default
+color listnormal          default default
+color listfocus           white   magenta
+color listnormal_unread   default default bold
+color listfocus_unread    white   magenta
+color title               white   magenta
+color info                white   magenta
+color hint-key            white   magenta
+color hint-keys-delimiter white   magenta
+color hint-separator      white   magenta
+color hint-description    white   magenta
+color article             default default

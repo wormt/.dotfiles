@@ -1,0 +1,554 @@
+vim9script
+set termguicolors
+
+set hidden
+set relativenumber
+set cursorline
+set cursorlineopt=both
+set list
+set listchars=trail:·,tab:»\ ,nbsp:␣,extends:›,precedes:‹
+set showbreak=↪\ 
+set breakindent
+set laststatus=2
+set statusline=%#Status1#%y\[%{empty(&fenc)\ ?\ &enc\ :\ &fenc}\|%{&fileformat}\]%r%m%#Status2#\ %F\ %=\ %l:%c\ %L
+set tabstop=4
+set shiftwidth=4
+packadd! matchit
+set smartindent
+set equalalways
+set splitbelow
+set splitright
+set splitkeep=screen
+set nostartofline
+set completeopt=menuone,noselect,noinsert
+set scrolloff=8
+set sidescrolloff=4
+set pumheight=16
+set shortmess+=c
+set ignorecase
+set smartcase
+set undofile
+set swapfile
+set directory=~/.cache/vim/swap
+set undodir=~/.cache/vim/undo
+set path+=**
+set wildmenu
+set wildmode=longest:full,full
+set title
+set ttimeoutlen=67
+set updatetime=420
+set mouse=a
+augroup terminal_setup
+  au!
+  autocmd TerminalOpen * setlocal nospell nonumber nobuflisted textwidth=0 winheight=1
+augroup END
+filetype plugin on
+filetype plugin indent on
+syntax on
+imap <C-BS> <C-W>
+cnoremap %% <C-R>=fnameescape(expand("%:p:h")."/")<CR>
+
+if has('clipboard_provider') && executable('wl-copy')
+  set t_fd=
+  set t_fe=
+  def WlClipCopy(reg: string, regtype: string, lines: list<string>)
+    call system('wl-copy', join(lines, "\n") .. (regtype[0] ==# 'V' ? "\n" : ''))
+    if v:shell_error != 0
+      echohl WarningMsg | echom 'wl-copy failed' | echohl None
+    endif
+  enddef
+
+  def WlClipPaste(reg: string): list<any>
+    var lines = systemlist('wl-paste --no-newline')
+    if v:shell_error != 0
+      return []   # invalid return = register left unchanged, per the docs
+    endif
+    return ['', lines]
+  enddef
+
+  v:clipproviders['wl'] = {
+    available: () => !empty($WAYLAND_DISPLAY),
+    copy:  {'+': WlClipCopy,  '*': WlClipCopy},
+    paste: {'+': WlClipPaste, '*': WlClipPaste},
+  }
+  set clipmethod^=wl
+endif
+
+# git clone https://github.com/k-takata/minpac.git ~/.config/vim/pack/minpac/opt/minpac
+def PackInit()
+  packadd minpac
+  call minpac#init()
+  call minpac#add('k-takata/minpac', {'type': 'opt'})
+
+  # colorscheme
+  call minpac#add('ayu-theme/ayu-vim')
+
+  #lsp/linting/formatting
+  call minpac#add('yegappan/lsp')
+  call minpac#add('dense-analysis/ale')
+
+  #git stuff this shit runs git like every second
+  call minpac#add('airblade/vim-gitgutter')
+  call minpac#add('Eliot00/git-lens.vim')
+
+  #useful shortcuts
+  call minpac#add('ubaldot/vim-op-surround')
+  call minpac#add('mao-yining/undotree.vim')
+
+  #repl
+  call minpac#add('ubaldot/vim-replica')
+
+  # vimwiki :)
+  call minpac#add('vimwiki/vimwiki')
+enddef
+
+command! PackUpdate source $MYVIMRC | call PackInit() | call minpac#update()
+command! PackClean  source $MYVIMRC | call PackInit() | call minpac#clean()
+command! PackStatus packadd minpac  | call PackInit() | call minpac#status()
+
+# silently add now so ayu-vim doesnt error
+silent! packadd ayu-vim
+
+
+#light
+#set background=light
+#highlight LineNr guifg=#f040a0
+#highlight CursorLine guibg=#f7f7f7 term=none cterm=none
+#highlight CursorLineNr guibg=#f4f4f4 gui=bold term=none cterm=bold
+#highlight CursorColumn guibg=#f8f8f8
+#highlight Folded guibg=#ff4faf guifg=#ffffff gui=bold
+#highlight Status1 guibg=#f040a0 guifg=#ffffff gui=bold
+#highlight Status2 guibg=#f040a0 guifg=#ffffff
+
+#dark
+#set background=dark
+#highlight CursorLine guibg=#984373 term=none cterm=none
+#highlight CursorLineNr guibg=#984373 gui=bold term=none cterm=bold
+#highlight CursorColumn guibg=#984373
+#highlight Folded guibg=#5a5a5a guifg=#f040a0 gui=bold
+#highlight Status1 guibg=#f040a0 guifg=#ffffff gui=bold
+#highlight Status2 guibg=#f040a0 guifg=#ffffff
+
+#powershell
+#set background=dark
+#highlight CursorLine guibg=#084483 term=none cterm=none
+#highlight CursorLineNr guibg=#084483 gui=bold term=none cterm=bold
+#highlight CursorColumn guibg=#084483
+#highlight Folded guibg=#5a5a5a guifg=#0b57a8 gui=bold
+#highlight Status1 guibg=#0b57a8 guifg=#ffffff gui=bold
+#highlight Status2 guibg=#0b57a8 guifg=#ffffff
+
+#ayu
+g:ayucolor = "dark"
+colorscheme ayu
+
+augroup lsp_options
+  au!
+  autocmd User LspSetup call g:LspOptionsSet({
+    \ 'autoComplete': v:true,
+    \ 'showDiagWithSign': v:true,
+    \ 'showDiagWithVirtualText': v:false,
+    \ 'highlightDiagInline': v:true,
+    \ 'showDiagInPopup': v:false,
+    \ 'autoHighlightDiags': v:true,
+    \ 'autoHighlight': v:true,
+    \ 'semanticHighlight': v:true,
+    \ 'showInlayHints': v:true,
+    \ 'showSignature': v:true,
+    \ 'echoSignature': v:true,
+    \ 'diagSignErrorText': '✘',
+    \ 'diagSignWarningText': '▲',
+    \ 'diagSignInfoText': 'ℹ',
+    \ 'diagSignHintText': '●',
+    \ })
+augroup END
+
+highlight Error ctermfg=red guifg=red ctermbg=NONE guibg=NONE cterm=bold gui=bold
+highlight Todo  ctermfg=lightyellow guifg=lightyellow ctermbg=NONE guibg=NONE cterm=bold gui=bold
+
+# diagnostics
+highlight LspDiagInlineError   ctermfg=red      guisp=#e06c75 cterm=undercurl gui=undercurl
+highlight LspDiagInlineWarning ctermfg=yellow     guisp=#e5c07b cterm=underline gui=underline
+highlight LspDiagInlineInfo  ctermfg=lightblue  guisp=#61afef cterm=underline gui=underline
+highlight LspDiagInlineHint  ctermfg=lightmagenta guisp=#c678dd cterm=underline gui=underline
+#gutter
+highlight LspErrorText    guifg=#FF3333 guibg=NONE gui=bold
+highlight LspWarningText    guifg=#FFB454 guibg=NONE gui=bold
+highlight LspInformationText  guifg=#36A3D9 guibg=NONE
+highlight LspHintText     guifg=#95E6CB guibg=NONE
+highlight LspCodeActionText   guifg=#E7C547 guibg=NONE
+# document highlight
+highlight LspReference    guibg=#253340 guifg=NONE
+highlight LspReferenceText  guibg=#253340 guifg=NONE
+highlight LspReferenceRead  guibg=#253340 guifg=NONE
+highlight LspReferenceWrite guibg=#2E3A2A guifg=NONE
+
+highlight Status1     guibg=#FFB454 guifg=#0F1419 gui=bold
+highlight Status2     guibg=#253340 guifg=#E6E1CF gui=NONE
+highlight StatusLine  guibg=#253340 guifg=#E6E1CF gui=NONE
+highlight StatusLineNC  guibg=#161D24 guifg=#8A94A0 gui=NONE
+
+highlight LineNr    guifg=#5C6773 guibg=NONE
+highlight CursorLineNr  guifg=#FFB454 guibg=#1B232C gui=bold
+highlight CursorLine    guibg=#1B232C guifg=NONE
+highlight CursorColumn    guibg=#1B232C guifg=NONE
+highlight CursorLineConceal guibg=#1B232C guifg=#5C6773
+
+highlight VertSplit  guifg=#5C6773 guibg=NONE gui=NONE
+highlight WinSeparator guifg=#5C6773 guibg=NONE gui=NONE
+
+g:ale_disable_lsp = 1
+g:ale_linters_explicit = 1
+g:ale_fix_on_save = 1
+g:ale_fixers = {
+  \ 'python':   ['ruff', 'ruff_format'],
+  \ 'json':     ['prettier'],
+  \ 'jsonc':    ['prettier'],
+  \ 'javascript': ['prettier'],
+  \ 'typescript': ['prettier'],
+  \ 'terraform':  ['terraform'],
+  \ 'go':     ['goimports', 'gofmt'],
+  \ 'rust':     ['rustfmt'],
+  \ 'zig':    ['zigfmt'],
+  \ 'sh':     ['shfmt'],
+  \ 'bash':     ['shfmt'],
+  \ }
+
+au BufRead,BufNewFile *.vrl setlocal filetype=vrl
+if executable('vrl')
+  autocmd FileType vrl setlocal makeprg=vrl\ --program\ %\ --input\ /dev/null
+elseif executable('vector')
+  autocmd FileType vrl setlocal makeprg=vector\ vrl\ --program\ %\ --input\ /dev/null
+endif
+
+def SqlFluffFormat()
+  var view = winsaveview()
+  var src  = getline(1, '$')
+  var out  = systemlist('sqlfluff format --dialect ansi -', src)
+  if v:shell_error == 0 && !empty(out)
+    if out !=# src
+      deletebufline('%', 1, '$')
+      setline(1, out)
+    endif
+  else
+    echohl WarningMsg | echom 'sqlfluff: ' .. join(out, ' ') | echohl None
+  endif
+  winrestview(view)
+enddef
+
+if executable('sqlfluff')
+  augroup sqlfluff_format
+    au!
+    autocmd BufWritePre * if &filetype ==# 'sql' | SqlFluffFormat() | endif
+    autocmd FileType sql setlocal formatprg=SqlFluffFormat()
+  augroup END
+endif
+
+def OnLspAttached()
+  augroup lsp_cursor_diag
+    autocmd! CursorHold <buffer>
+    autocmd CursorHold <buffer> silent! LspDiag current
+  augroup END
+
+  nnoremap <buffer> <silent> <leader>gd <Cmd>LspGotoDefinition<CR>
+  nnoremap <buffer> <silent> <leader>gD <Cmd>LspGotoDeclaration<CR>
+  nnoremap <buffer> <silent> <leader>gi <Cmd>LspGotoImpl<CR>
+  nnoremap <buffer> <silent> <leader>gr <Cmd>LspShowReferences<CR>
+  nnoremap <buffer> <silent> <leader>gt <Cmd>LspGotoTypeDef<CR>
+  nnoremap <buffer> <silent> <leader>K  <Cmd>LspHover<CR>
+  nnoremap <buffer> <silent> <leader>rn <Cmd>LspRename<CR>
+  nnoremap <buffer> <silent> <leader>ca <Cmd>LspCodeAction<CR>
+  nnoremap <buffer> <silent> <leader>dl <Cmd>LspDiag show<CR>
+  nnoremap <buffer> <silent> [d <Cmd>LspDiag prev<CR>
+  nnoremap <buffer> <silent> ]d <Cmd>LspDiag next<CR>
+  nnoremap <buffer> <silent> <leader>f  <Cmd>LspFormat<CR>
+  nnoremap <buffer> <silent> <leader>ds <Cmd>LspDocumentSymbol<CR>
+  nnoremap <buffer> <silent> <leader>ws <Cmd>LspSymbolSearch<CR>
+  nnoremap <buffer> <silent> <leader>pe <Cmd>LspPeekDefinition<CR>
+
+  nnoremap <buffer> ]q :cnext<CR>
+  nnoremap <buffer> [q :cprev<CR>
+  nnoremap <buffer> ]Q :clast<CR>
+  nnoremap <buffer> [Q :cfirst<CR>
+  setlocal signcolumn=yes
+
+enddef
+
+augroup lsp_attach
+  au!
+  autocmd User LspAttached call OnLspAttached()
+augroup END
+
+def HasPrettierRc(): bool
+  var dir = expand('%:p:h')
+  for name in [
+        \ '.prettierrc',
+        \ '.prettierrc.json', '.prettierrc.yaml', '.prettierrc.yml',
+        \ '.prettierrc.json5', '.prettierrc.toml',
+        \ '.prettierrc.js', '.prettierrc.cjs', '.prettierrc.mjs',
+        \ '.prettierrc.ts', '.prettierrc.cts', '.prettierrc.mts',
+        \ 'prettier.config.js', 'prettier.config.cjs', 'prettier.config.mjs',
+        \ 'prettier.config.ts', 'prettier.config.cts', 'prettier.config.mts']
+    if !empty(findfile(name, dir .. ';'))
+      return true
+    endif
+  endfor
+  return false
+enddef
+
+def PrettierYaml()
+  var view = winsaveview()
+  var src  = getline(1, '$')
+  var out  = systemlist('prettier --stdin-filepath ' .. shellescape(expand('%:p')), src)
+  if v:shell_error == 0 && !empty(out)
+    if out !=# src
+      call deletebufline('%', 1, '$')
+      call setline(1, out)
+    endif
+  else
+    echohl WarningMsg | echom 'prettier: ' .. join(out, ' ') | echohl None
+  endif
+  call winrestview(view)
+enddef
+
+def YamlFormatOnSave()
+  if executable('prettier') && HasPrettierRc()
+    call PrettierYaml()
+  else
+    silent! LspFormat
+  endif
+enddef
+
+augroup yaml_fmt
+  au!
+  autocmd BufWritePre *.yaml,*.yml call YamlFormatOnSave()
+augroup END
+
+def RegisterLspServers()
+  # append to this and we will declare everything at the end once
+  var servers = []
+
+  if executable('ty') && executable('ruff')
+    call add(servers, {'name': 'ruff', 'filetype': ['python'], 'path': 'ruff', 'args': ['server']})
+    call add(servers, {'name': 'ty',   'filetype': ['python'], 'path': 'ty',   'args': ['server']})
+  elseif executable('pylsp') && executable('ruff')
+    var pylsp_cfg = {'pylsp': {'plugins': {
+      \ 'pycodestyle': {'enabled': v:false},
+      \ 'pyflakes':  {'enabled': v:false},
+      \ 'mccabe':    {'enabled': v:false},
+      \ 'yapf':    {'enabled': v:false},
+      \ 'autopep8':  {'enabled': v:false},
+      \ 'ruff':    {'enabled': v:true, 'formatEnabled': v:true},
+      \ }}}
+    call add(servers, {'name': 'pylsp', 'filetype': ['python'], 'path': 'pylsp', 'args': [], 'workspaceConfig': pylsp_cfg})
+  elseif executable('ty')
+    call add(servers, {'name': 'ty', 'filetype': ['python'], 'path': 'ty', 'args': ['server']})
+  elseif executable('ruff')
+    call add(servers, {'name': 'ruff', 'filetype': ['python'], 'path': 'ruff', 'args': ['server']})
+  elseif executable('pylsp')
+    var pylsp_cfg = {'pylsp': {'plugins': {
+      \ 'pycodestyle': {'enabled': v:false},
+      \ 'pyflakes':  {'enabled': v:true},
+      \ 'yapf':    {'enabled': v:false},
+      \ }}}
+    call add(servers, {'name': 'pylsp', 'filetype': ['python'], 'path': 'pylsp', 'args': [], 'workspaceConfig': pylsp_cfg})
+  endif
+
+  if executable('bash-language-server')
+    call add(servers, {'name': 'bashls', 'filetype': ['sh', 'bash'], 'path': 'bash-language-server', 'args': ['start']})
+  endif
+
+  if executable('nixd')
+    call add(servers, {'name': 'nixd', 'filetype': ['nix'], 'path': 'nixd', 'args': []})
+  endif
+
+  if executable('ansible-language-server')
+    var ansible_opts = {'ansible': {'validation': {'lint': {'enabled': v:true}}}}
+    call add(servers, {'name': 'ansiblels', 'filetype': ['yaml.ansible'], 'path': 'ansible-language-server', 'args': ['--stdio'], 'initializationOptions': ansible_opts})
+  endif
+
+  if executable('tofu-ls')
+    call add(servers, {'name': 'tofu-ls', 'filetype': ['terraform'], 'path': 'tofu-ls', 'args': ['serve']})
+  elseif executable('terraform-ls')
+    call add(servers, {'name': 'terraform-ls', 'filetype': ['terraform'], 'path': 'terraform-ls', 'args': ['serve']})
+  endif
+
+  if executable('nu')
+    call add(servers, {'name': 'nushell', 'filetype': ['nu'], 'path': 'nu', 'args': ['--lsp']})
+  endif
+
+  if executable('jsonnet-language-server')
+    call add(servers, {'name': 'jsonnet', 'filetype': ['jsonnet', 'libsonnet'], 'path': 'jsonnet-language-server', 'args': []})
+  endif
+
+  if executable('dhall-lsp-server')
+    call add(servers, {'name': 'dhall', 'filetype': ['dhall'], 'path': 'dhall-lsp-server', 'args': []})
+  endif
+
+  if executable('pwsh')
+    var pses_paths = [
+      \ expand('~/.local/share/powershell/Modules/PowerShellEditorServices/Start-EditorServices.ps1'),
+      \ expand('~/Documents/PowerShell/Modules/PowerShellEditorServices/Start-EditorServices.ps1'),
+      \ expand('~/.local/share/powershell/Modules/PowerShellEditorServices/PowerShellEditorServices/Start-EditorServices.ps1'),
+      \ expand('~/Documents/PowerShell/Modules/PowerShellEditorServices/PowerShellEditorServices/Start-EditorServices.ps1')]
+    var pses_found = null_string
+    for p in pses_paths
+      if filereadable(p)
+        pses_found = p
+        break
+      endif
+    endfor
+    if pses_found != ''
+      var pses_bundle = fnamemodify(pses_found, ':h')
+      add(servers, {
+        name: 'powershell-es',
+        filetype: ['ps1', 'powershell'],
+        path: 'pwsh',
+        args: ['-NoLogo', '-NoProfile', '-NonInteractive', '-Command', pses_found,
+             '-BundledModulesPath', pses_bundle, '-Stdio',
+             '-LogPath', expand('~/.cache/vim/pses.log'),
+             '-LogLevel', 'Warning', '-FeatureFlags', '@()'],
+      })
+    endif
+  endif
+
+  if executable('yaml-language-server')
+    var yaml_cfg = {'yaml': {'validate': v:true, 'completion': v:true, 'hover': v:true, 'yamlVersion': '1.2', 'schemaStore': {'enable': v:true}}}
+    call add(servers, {'name': 'yamlls', 'filetype': ['yaml', 'yml'], 'path': 'yaml-language-server', 'args': ['--stdio'], 'workspaceConfig': yaml_cfg})
+  endif
+
+  if executable('sqls')
+    call add(servers, {'name': 'sqls', 'filetype': ['sql', 'mysql', 'plsql', 'mssql'], 'path': 'sqls', 'args': []})
+  elseif executable('sql-language-server')
+    call add(servers, {'name': 'sqlls', 'filetype': ['sql', 'mysql', 'plsql', 'mssql'], 'path': 'sql-language-server', 'args': ['up', '--method', 'stdio']})
+  endif
+
+  if executable('gopls')
+    var gopls_cfg = {'gopls': {'staticcheck': v:true, 'usePlaceholders': v:true, 'completeUnimported': v:true}}
+    call add(servers, {'name': 'gopls', 'filetype': ['go', 'gomod', 'gowork', 'gohtmltmpl', 'gotexttmpl'], 'path': 'gopls', 'args': ['-remote=auto'], 'syncInit': v:true, 'workspaceConfig': gopls_cfg})
+  endif
+
+  if executable('rust-analyzer')
+    call add(servers, {'name': 'rust-analyzer', 'filetype': ['rust'], 'path': 'rust-analyzer', 'args': [], 'syncInit': v:true})
+  endif
+
+  if executable('typescript-language-server')
+    call add(servers, {'name': 'tsserver', 'filetype': ['javascript', 'typescript', 'typescriptreact', 'javascriptreact', 'typescript.tsx', 'javascript.jsx'], 'path': 'typescript-language-server', 'args': ['--stdio']})
+  endif
+
+  if executable('vscode-eslint-language-server')
+    call add(servers, {'name': 'eslint', 'filetype': ['javascript', 'typescript', 'typescriptreact', 'javascriptreact'], 'path': 'vscode-eslint-language-server', 'args': ['--stdio']})
+  endif
+
+  if executable('zls')
+    call add(servers, {'name': 'zls', 'filetype': ['zig'], 'path': 'zls', 'args': []})
+  endif
+
+  if executable('vscode-json-language-server')
+    call add(servers, {'name': 'jsonls', 'filetype': ['json', 'jsonc'], 'path': 'vscode-json-language-server', 'args': ['--stdio']})
+  endif
+
+  if executable('taplo')
+    call add(servers, {'name': 'taplo', 'filetype': ['toml'], 'path': 'taplo', 'args': ['lsp', 'stdio']})
+  endif
+
+  if executable('awk-language-server')
+    call add(servers, {'name': 'awkls', 'filetype': ['awk'], 'path': 'awk-language-server', 'args': []})
+  endif
+
+  if executable('csharp-ls')
+    call add(servers, {'name': 'csharp-ls', 'filetype': ['cs'], 'path': 'csharp-ls', 'args': []})
+  endif
+
+  if executable('promql-langserver')
+    call add(servers, {'name': 'promql', 'filetype': ['promql'], 'path': 'promql-langserver', 'args': ['--config-file', expand('~/.config/promql-langserver.yaml')]})
+  endif
+
+  if !empty(servers)
+    call g:LspAddServer(servers)
+  endif
+enddef
+
+augroup lsp_servers
+  au!
+  autocmd User LspSetup call RegisterLspServers()
+augroup END
+
+augroup lsp_filetypes
+  au!
+  au BufRead,BufNewFile *.nu setlocal filetype=nu
+  au BufRead,BufNewFile *.ps1,*.psm1,*.psd1 setlocal filetype=ps1
+  au BufRead,BufNewFile *.zig,*.zon setlocal filetype=zig
+  au BufRead,BufNewFile *.jsonc setlocal filetype=jsonc
+  au BufRead,BufNewFile *.hujson setlocal filetype=jsonc
+  au BufRead,BufNewFile *.jsonld setlocal filetype=json
+  au BufRead,BufNewFile *.toml,Cargo.lock setlocal filetype=toml
+  au BufRead,BufNewFile *.awk,*.gawk setlocal filetype=awk
+  au BufRead,BufNewFile *.csx setlocal filetype=cs
+  au BufRead,BufNewFile *.promql setlocal filetype=promql
+  au BufRead,BufNewFile *.hcl setlocal filetype=hcl
+  au BufRead,BufNewFile *.pkr.hcl setlocal filetype=hcl
+  au BufRead,BufNewFile *.pkr.json setlocal filetype=json
+augroup END
+
+augroup hcl_fmt
+  au!
+  if executable('packer')
+    autocmd FileType hcl setlocal formatprg=packer\ fmt\ -
+  endif
+augroup END
+
+if executable('ansible-language-server')
+  augroup lsp_ansible_detect
+    au!
+    au BufRead,BufNewFile */playbooks/*.yml,*/playbooks/*.yaml setlocal filetype=yaml.ansible
+    au BufRead,BufNewFile */roles/*.yml,*/roles/*.yaml     setlocal filetype=yaml.ansible
+    au BufRead,BufNewFile */tasks/*.yml,*/tasks/*.yaml     setlocal filetype=yaml.ansible
+    au BufRead,BufNewFile */handlers/*.yml,*/handlers/*.yaml   setlocal filetype=yaml.ansible
+    au BufRead,BufNewFile *ansible*/*.yml,*ansible*/*.yaml   setlocal filetype=yaml.ansible
+  augroup END
+endif
+
+if executable('rg')
+  set grepprg=rg\ --vimgrep\ --smart-case
+  set grepformat=%f:%l:%c:%m
+endif
+
+packadd! editorconfig
+
+nnoremap <silent> <leader>gl :call ToggleGitLens()<CR>
+
+g:gitgutter_sign_priority = 9
+
+g:op_surround_maps = [
+  \ {'map': 'sa(', 'open_delim': '(', 'close_delim': ')', 'action': 'append'},
+  \ {'map': 'sd(', 'open_delim': '(', 'close_delim': ')', 'action': 'delete'},
+  \ {'map': 'sa[', 'open_delim': '[', 'close_delim': ']', 'action': 'append'},
+  \ {'map': 'sd[', 'open_delim': '[', 'close_delim': ']', 'action': 'delete'},
+  \ {'map': 'sa{', 'open_delim': '{', 'close_delim': '}', 'action': 'append'},
+  \ {'map': 'sd{', 'open_delim': '{', 'close_delim': '}', 'action': 'delete'},
+  \ {'map': 'sa"', 'open_delim': '"', 'close_delim': '"', 'action': 'append'},
+  \ {'map': 'sd"', 'open_delim': '"', 'close_delim': '"', 'action': 'delete'},
+  \ {'map': "sa'", 'open_delim': "'", 'close_delim': "'", 'action': 'append'},
+  \ {'map': "sd'", 'open_delim': "'", 'close_delim': "'", 'action': 'delete'},
+  \ {'map': 'sa`', 'open_delim': '`', 'close_delim': '`', 'action': 'append'},
+  \ {'map': 'sd`', 'open_delim': '`', 'close_delim': '`', 'action': 'delete'},
+  \ ]
+
+nnoremap <silent> <leader>u :UndotreeToggle<CR>
+
+xnoremap <silent> <leader>r :ReplicaSendLines<CR>
+
+inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+inoremap <expr> <CR>  pumvisible() ? "\<C-y>" : "\<CR>"
+
+g:vimwiki_list = [{'path': '~/wiki/', 'syntax': 'markdown', 'ext': '.md'}]
+g:vimwiki_autowriteall = 0
+g:vimwiki_global_ext = 0
+g:vim_markdown_conceal = 3
+g:vim_markdown_edit_url_in = 'tab'
+for i in ['follow_anchor', 'conceal_code_blocks', 'math',
+          'toml_frontmatter', 'frontmatter', 'strikethrough']
+  g:['vim_markdown_' .. i] = 1
+endfor

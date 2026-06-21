@@ -1,0 +1,108 @@
+// -*- mode: jsonc -*-
+{
+	"layer": "top", // Waybar at top layer
+	// "position": "bottom", // Waybar position (top|bottom|left|right)
+	"height": 14, // Waybar height (to be removed for auto height)
+	// "width": 1280, // Waybar width
+	"spacing": 8, // Gaps between modules (4px)
+	// Choose the order of the modules
+	"modules-left": [
+		"wlr/taskbar"
+	],
+	"modules-center": [
+		"mpd"
+	],
+	"modules-right": [
+		"tray",
+		"network",
+		"battery",
+		"clock"
+	],
+	// Modules configuration
+	// "sway/workspaces": {
+	//	 "disable-scroll": true,
+	//	 "all-outputs": true,
+	//	 "warp-on-scroll": false,
+	//	 "format": "{name}: {icon}",
+	//	 "format-icons": {
+	//		 "1": "",
+	//		 "2": "",
+	//		 "3": "",
+	//		 "4": "",
+	//		 "5": "",
+	//		 "urgent": "",
+	//		 "focused": "",
+	//		 "default": ""
+	//	 }
+	// },
+	"wlr/taskbar": {
+		"format": "{{icon}{title:.30}.30}",
+		"icon-size":18,
+		"tooltip-format": "{title}",
+		"on-click": "minimize-raise",
+		"on-click-middle": "close",
+		"active-first": true
+	},
+	"keyboard-state": {
+		"numlock": true,
+		"capslock": true,
+		"format": "{name} {icon}",
+		"format-icons": {
+			"locked": "",
+			"unlocked": ""
+		}
+	},
+	"mpd": {
+		"format": "{artist} - {album} - {title}",
+		"format-disconnected": "",
+		"format-stopped": " ",
+		"format-paused": " ",
+		"title-len": 16,
+		"artist-len": 20,
+		"album-len": 16,
+		"unknown-tag": "N/A",
+		"interval": 5,
+		"consume-icons": {
+			"on": " "
+		},
+		"random-icons": {
+			"on": " "
+		},
+		"repeat-icons": {
+			"on": " "
+		},
+		"single-icons": {
+			"on": "1 "
+		},
+		"state-icons": {
+			"paused": "",
+			"playing": ""
+		},
+		"tooltip-format": "{stateIcon} {consumeIcon}{randomIcon}{repeatIcon}{singleIcon}{artist} - {album} - {title} ({elapsedTime:%M:%S}/{totalTime:%M:%S}) ⸨{songPosition}|{queueLength}⸩ {volume}%",
+		"tooltip-format-disconnected": "MPD (disconnected)"
+	},
+	"tray": {
+		"icon-size": 12,
+		"spacing": 2
+	},
+	"clock": {
+		"timezone": "America/Los_Angeles",
+		"format": "[{:%I:%M}]",
+		"tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
+		"format-alt": "[{:%Y-%m-%d}]"
+	},
+	"battery": {
+		"format": "[{capacity}%]",
+		"format-alt": "[{time}]",
+		"tooltip-format": "health {health}%"
+	},
+	"network": {
+		"format-wifi": "[{ifname} ({signalStrength}%)]",
+		"format-ethernet": "[{ipaddr}/{cidr}]",
+		"tooltip-format": "[{ifname} via {gwaddr}]",
+		"tooltip-format-wifi": "[{essid}, {ifname} via {gwaddr}]",
+		"format-linked": "[{ifname} (No IP)]",
+		"format-disconnected": "[Disconnected]",
+		"format-alt": "[{ifname}: {ipaddr}/{cidr}]"
+	}
+}

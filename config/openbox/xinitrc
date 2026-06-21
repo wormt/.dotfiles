@@ -1,0 +1,16 @@
+#!/bin/sh
+xset r rate 250 99
+xrdb ./xresources
+if ! mountpoint -q $HOME/sshfs;then sshfs -o idmap=user -o follow_symlinks -o uid=1000 -o gid=1000 sshfs:/opt/sshfs/sshfs $HOME/sshfs;fi&
+/usr/libexec/pipewire-launcher&
+xcompmgr&
+#redshift -l 37:-117 -t 6500:3000&
+dunst&
+/usr/libexec/xdg-desktop-portal-lxqt&
+feh --no-fehbg --bg-fill "$(ls -d1 $HOME/pic/hh/*.*|shuf -n 1)"&
+uutils-tail -f "$XDG_CACHE_HOME/wlu"|xob -m 852&
+uutils-tail -f "$XDG_CACHE_HOME/wgv"|xob&
+sleep 1;yambar -c "$XDG_CONFIG_HOME"/yambar/xwindow.yml&
+mpd --no-daemon&
+oneko&
+exec /usr/bin/openbox-session

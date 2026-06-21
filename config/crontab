@@ -1,0 +1,2 @@
+0 2 * * * trash-empty --trash-dir "$HOME/.local/share/trash" 7
+0 2 * * * trash-empty 7

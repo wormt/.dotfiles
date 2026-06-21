@@ -1,0 +1,60 @@
+# clutter
+*.swp
+*.un~
+*~
+*.bak
+*.old
+*.log
+*.png
+*.tar
+__pycache__/
+
+# icewm
+ahistory
+
+# mlterm
+pts_*
+*.snp
+*.six
+*.rgs
+config/mlterm/challenge
+
+# crypto
+*.age
+*.gpg
+
+# vim
+plugged/
+minpac/
+config/vim/spell/
+.netrwhist
+
+# nushell
+nupm/
+history.txt
+
+# mpd
+playlists/
+
+# aerc
+accounts.conf
+
+# weechat
+config/weechat/
+!config/weechat/alias.conf
+!config/weechat/buflist.conf
+!config/weechat/charset.conf
+!config/weechat/exec.conf
+!config/weechat/fifo.conf
+!config/weechat/fset.conf
+!config/weechat/logger.conf
+!config/weechat/plugins.conf
+!config/weechat/relay.conf
+!config/weechat/script.conf
+!config/weechat/trigger.conf
+!config/weechat/typing.conf
+!config/weechat/weechat.conf
+!config/weechat/xfer.conf
+
+# venv
+.nix-chroot/

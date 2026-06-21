@@ -1,0 +1,16 @@
+user-agent ""
+notification-command ""
+download-timeout 60
+download-speed-limit 1000
+download-max-host-connections 2
+scrolloff 4
+color-status color231 color13 bold
+color-status-info color231 color13 bold
+color-status-fail color231 color9 bold
+color-list-item color13 default
+color-list-item-unread color13 default bold
+color-list-item-important color13 default bold
+color-list-feed color13 default
+color-list-feed-unread color13 default bold
+color-list-section color13 default
+color-list-section-unread color13 default bold

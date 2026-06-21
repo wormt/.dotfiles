@@ -1,0 +1,173 @@
+bar:
+ monitor: eDP-1
+ height: 14
+ location: top
+ background: ffffffff
+ foreground: 000000ff
+ font: "Monaco:size=11,HanaMinB:size=11"
+ trackpad-sensitivity: 8
+ left:
+  - foreign-toplevel:
+     content:
+      map:
+       conditions:
+        ~activated: {empty: {}}
+        activated: {string: {text: " {title}",max: 99}}
+ center:
+  - mpd:
+     host: /run/user/1000/mpd/socket
+     content:
+      map:
+       on-click:
+        left: mpc next
+        middle: mpc toggle
+        right: mpc prev
+        wheel-up: mpc volume +1
+        wheel-down: mpc volume -1
+       conditions:
+        state != "playing": {string: {text: "                "}}
+        state == "playing":
+         map:
+          conditions:
+           album != "": {string: {text: "{artist} - {album} - {title}",max: 99}}
+           album == "": {string: {text: "{artist} - {title}",max: 99}}
+ right:
+  - script:
+     path: ~/.config/yambar/idle
+     poll-interval: 9999
+     content:
+      map:
+       on-click:
+        left: /bin/sh -c "$HOME/.local/bin/swidle"
+       conditions:
+        idle: {string: {text: "[zz]",foreground: 000000ff,deco: {background: {color: 70df70ff}}}}
+  - alsa:
+     card: default
+     mixer: Master
+     content:
+      map:
+       on-click:
+        left: /bin/sh -c "$HOME/.config/yambar/open_pavu_control"
+        #left: /bin/sh -c "wgv 1%+"
+        #right: /bin/sh -c "wgv 1%-"
+        middle: /bin/sh -c "amixer -D default:0 sset Master 1+ toggle"
+        wheel-up: /bin/sh -c "wgv 1%+"
+        wheel-down: /bin/sh -c "wgv 1%-"
+       conditions:
+        online && ~muted: {string: {text: "[{percent}]",foreground: 000000ff,deco: {background: {color: ec7facff}}}}
+        online && muted: {string: {text: "{{percent}}",foreground: 000000ff,deco: {background: {color: ff4c4cff}}}}
+        ~online: {string: {text: "{!!}",foreground: 000000ff,deco: {background: {color: ff4c4cff}}}}
+# - pipewire:
+#    content:
+#     string: {text: "[{cubic_volume}]",foreground: 000000ff,deco: {background: {color: ec7facff}}}
+  - battery:
+     name: BAT0
+     poll-interval: 9999
+     content:
+      map:
+       conditions:
+        state == "full": {string: {text: "[yay|",foreground: 000000ff,deco: {background: {color: 80ff80ff}}}}
+        state == "charging":
+         ramp:
+          tag: capacity
+          items:
+           - string: {text: "[{capacity}+|",foreground: 000000ff,deco: {background: {color: ff4c4cff}}}
+           - string: {text: "[{capacity}+|",foreground: 000000ff,deco: {background: {color: ff9c33ff}}}
+           - string: {text: "[{capacity}+|",foreground: 000000ff,deco: {background: {color: ff9c33ff}}}
+           - string: {text: "[{capacity}+|",foreground: 000000ff,deco: {background: {color: 80ff80ff}}}
+           - string: {text: "[{capacity}+|",foreground: 000000ff,deco: {background: {color: 80ff80ff}}}
+        state == "discharging":
+         ramp:
+          tag: capacity
+          items:
+           - string: {text: "[{capacity}-:{estimate}|",foreground: 000000ff,deco: {background: {color: ff4c4cff}}}
+           - string: {text: "[{capacity}-:{estimate}|",foreground: 000000ff,deco: {background: {color: ff9c33ff}}}
+           - string: {text: "[{capacity}-:{estimate}|",foreground: 000000ff,deco: {background: {color: ff9c33ff}}}
+           - string: {text: "[{capacity}-:{estimate}|",foreground: 000000ff,deco: {background: {color: 80ff80ff}}}
+           - string: {text: "[{capacity}-:{estimate}|",foreground: 000000ff,deco: {background: {color: 80ff80ff}}}
+        state == "not charging":
+         ramp:
+          tag: capacity
+          items:
+           - string: {text: "[{capacity}=|",foreground: 000000ff,deco: {background: {color: ff4c4cff}}}
+           - string: {text: "[{capacity}=|",foreground: 000000ff,deco: {background: {color: ff9c33ff}}}
+           - string: {text: "[{capacity}=|",foreground: 000000ff,deco: {background: {color: ff9c33ff}}}
+           - string: {text: "[{capacity}=|",foreground: 000000ff,deco: {background: {color: 80ff80ff}}}
+           - string: {text: "[{capacity}=|",foreground: 000000ff,deco: {background: {color: 80ff80ff}}}
+           - string: {text: "[{capacity}=|",foreground: 000000ff,deco: {background: {color: 80ff80ff}}}
+        state == "unknown":
+         ramp:
+          tag: capacity
+          items:
+           - string: {text: "[{capacity}?|",foreground: 000000ff,deco: {background: {color: ff4c4cff}}}
+           - string: {text: "[{capacity}?|",foreground: 000000ff,deco: {background: {color: ff9c33ff}}}
+           - string: {text: "[{capacity}?|",foreground: 000000ff,deco: {background: {color: ff9c33ff}}}
+           - string: {text: "[{capacity}?|",foreground: 000000ff,deco: {background: {color: 80ff80ff}}}
+           - string: {text: "[{capacity}?|",foreground: 000000ff,deco: {background: {color: 80ff80ff}}}
+  - battery:
+     name: BAT1
+     poll-interval: 9999
+     content:
+      map:
+       conditions:
+        state == "full": {string: {text: "yay]",foreground: 000000ff,deco: {background: {color: 80ff80ff}}}}
+        state == "charging":
+         ramp:
+          tag: capacity
+          items:
+           - string: {text: "{capacity}+]",foreground: 000000ff,deco: {background: {color: ff4c4cff}}}
+           - string: {text: "{capacity}+]",foreground: 000000ff,deco: {background: {color: ff9c33ff}}}
+           - string: {text: "{capacity}+]",foreground: 000000ff,deco: {background: {color: ff9c33ff}}}
+           - string: {text: "{capacity}+]",foreground: 000000ff,deco: {background: {color: 80ff80ff}}}
+           - string: {text: "{capacity}+]",foreground: 000000ff,deco: {background: {color: 80ff80ff}}}
+        state == "discharging":
+         ramp:
+          tag: capacity
+          items:
+           - string: {text: "{capacity}-:{estimate}]",foreground: 000000ff,deco: {background: {color: ff4c4cff}}}
+           - string: {text: "{capacity}-:{estimate}]",foreground: 000000ff,deco: {background: {color: ff9c33ff}}}
+           - string: {text: "{capacity}-:{estimate}]",foreground: 000000ff,deco: {background: {color: ff9c33ff}}}
+           - string: {text: "{capacity}-:{estimate}]",foreground: 000000ff,deco: {background: {color: 80ff80ff}}}
+           - string: {text: "{capacity}-:{estimate}]",foreground: 000000ff,deco: {background: {color: 80ff80ff}}}
+        state == "not charging":
+         ramp:
+          tag: capacity
+          items:
+           - string: {text: "{capacity}=]",foreground: 000000ff,deco: {background: {color: ff4c4cff}}}
+           - string: {text: "{capacity}=]",foreground: 000000ff,deco: {background: {color: ff9c33ff}}}
+           - string: {text: "{capacity}=]",foreground: 000000ff,deco: {background: {color: ff9c33ff}}}
+           - string: {text: "{capacity}=]",foreground: 000000ff,deco: {background: {color: 80ff80ff}}}
+           - string: {text: "{capacity}=]",foreground: 000000ff,deco: {background: {color: 80ff80ff}}}
+           - string: {text: "{capacity}=]",foreground: 000000ff,deco: {background: {color: 80ff80ff}}}
+        state == "unknown":
+         ramp:
+          tag: capacity
+          items:
+           - string: {text: "{capacity}?]",foreground: 000000ff,deco: {background: {color: ff4c4cff}}}
+           - string: {text: "{capacity}?]",foreground: 000000ff,deco: {background: {color: ff9c33ff}}}
+           - string: {text: "{capacity}?]",foreground: 000000ff,deco: {background: {color: ff9c33ff}}}
+           - string: {text: "{capacity}?]",foreground: 000000ff,deco: {background: {color: 80ff80ff}}}
+           - string: {text: "{capacity}?]",foreground: 000000ff,deco: {background: {color: 80ff80ff}}}
+  - network:
+     content:
+      map:
+       conditions:
+        name == wlp4s0 && state != "up":
+         map:
+          default: {string: {text: "[{name}]",foreground: 000000ff,deco: {background: {color: ff4c4cff}}}}
+          conditions:
+           name == enp0s31f6 && state == "up": {string: {text: "[{name}]",foreground: 000000ff,deco: {background: {color: ffff4dff}}}}
+        name == wlp4s0 && state == "up":
+         map:
+          default: {string: {text: "[{name}]",foreground: 000000ff,deco: {background: {color: ffff4dff}}}}
+          conditions:
+           name == enp0s31f6 && state == "up": {string: {text: "[{name}]",foreground: 000000ff,deco: {background: {color: ffff4dff}}}}
+  - network:
+     content:
+      map:
+       conditions:
+        (name == airvpn || name == vpn || name == la1 || name == la2 || name == la3 || name == tun0) && state != "down": {string: {text: "[{name}]",foreground: 000000ff,deco: {background: {color: d779a6ff}}}}
+  - clock:
+     date-format: "%a %d|%I:%M"
+     content:
+       - string: {text: "[{date}]",foreground: 000000ff,deco: {background: {color: 66b5ffff}}}

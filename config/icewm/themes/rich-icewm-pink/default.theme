@@ -1,0 +1,66 @@
+ThemeDescription="abriction"
+
+ThemeAuthor="anon"
+
+Look=flat
+TitleBarHeight=0
+TitleBarJustify=0
+
+TitleButtonsLeft=""
+TitleButtonsRight=""
+TitleButtonsSupported=""
+
+BorderSizeX=4
+BorderSizeY=4
+CornerSizeX=8
+CornerSizeY=8
+DlgBorderSizeX=2
+DlgBorderSizeY=2
+
+ColorNormalBorder="rgb:4f/4f/4f"
+ColorActiveBorder="rgb:ff/4f/af"
+ColorActiveTitleBar="rgb:c6/c5/c4"
+ColorNormalTitleBar="rgb:c6/c5/c4"
+ColorNormalButton="rgb:c6/c5/c4"
+ColorNormalMenu="rgb:e6/e5/e4"
+ColorActiveMenuItem="rgb:b5/5b/88"
+ColorNormalMenuItemText="rgb:11/11/11"
+ColorActiveMenuItemText="rgb:ff/ff/ff"
+ColorDisabledMenuItemText="rgb:80/80/80"
+ColorMoveSizeStatus="rgb:b5/5b/88"
+ColorMoveSizeStatusText="rgb:ee/ee/ee"
+
+ColorInputSelection="rgb:b5/5b/88"
+#taskbar parameters
+ColorDefaultTaskBar="rgb:22/22/22"
+ColorNormalTaskBarApp="rgb:22/22/22"
+ColorNormalTaskBarAppText="rgb:00/00/00"
+ColorActiveTaskBarApp="rgb:b5/5b/88"
+ColorActiveTaskBarAppText="rgb:ff/ff/ff"
+ColorMinimizedTaskBarApp="rgb:22/22/22"
+ColorMinimizedTaskBarAppText="rgb:b3/b3/b3"
+#listbox
+ColorListBox="rgb:CC/CC/CC"
+ColorListBoxText="rgb:00/00/00"
+ColorListBoxSelection="rgb:CC/CC/FF"
+ColorListBoxSelectionText="rgb:00/00/00"
+#Dialog box
+ColorDialog="rgb:22/22/22"
+#Tooltip text
+ColorToolTip="rgb:22/22/22"
+ColorToolTipText="rgb:ff/ff/FF"
+#scrollbar
+ColorScrollBar="rgb:C0/C0/C0"
+ColorScrollBarSlider="rgb:C0/C0/C0"
+ColorScrollBarButtonArrow="rgb:C0/C0/C0"
+#Quick switch
+ColorQuickSwitch="rgb:22/22/22"
+ColorQuickSwitchActive="rgb:b5/5b/88"
+ColorQuickSwitchText="rgb:FF/FF/FF"
+ColorClock="rgb:22/22/22"
+ColorClockText="rgb:ff/ff/ff"
+RolloverButtonsSupported=1
+#background parameters
+DesktopBackgroundCenter=0
+DesktopBackgroundScaled=1
+DesktopBackgroundImage="wallpaper.png"

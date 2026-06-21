@@ -1,0 +1,14 @@
+#!/bin/sh
+#if [ -w "$XDG_CONFIG_HOME"/yambar/wfs ];then
+#	rm "$XDG_CONFIG_HOME"/yambar/wfs
+#fi
+#if [ -w "$XDG_CONFIG_HOME"/polybar/wfs ];then
+#	rm "$XDG_CONFIG_HOME"/polybar/wfs
+#fi
+#exec /usr/bin/pipewire&
+xcompmgr -n&
+#redshift -l 37:-117 -t 6500:3000&
+dunst&
+xrandr --output eDP1 --mode 1920x1080 --left-of HDMI2 --scale .8 --output HDMI2 --mode 2560x1440 --right-of DP2 --scale .8 --primary&
+sleep 2;icewmbg -p -r -i ~/pic/dump1/changeofheart.png
+#systemctl --user restart xdg-desktop-portal.service

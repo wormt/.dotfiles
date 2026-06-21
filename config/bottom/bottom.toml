@@ -1,0 +1,47 @@
+[flags]
+rate="3333ms"
+regex=true
+default_time_value="80000ms"
+#basic=false
+battery=true
+disable_click=true
+color="default-light"
+process_memory_as_value=true
+tree=true
+process_command=true
+enable_gpu=true
+enable_cache_memory=true
+retention="1h"
+[processes]
+columns=["PID","User","Name","CPU%","Mem%","R/s","W/s","T.Read","T.Write","State","GMem%","GPU%"]
+[styles]
+theme="default-light"
+[styles.cpu]
+avg_entry_color="magenta"
+cpu_core_colors=["magenta","red","blue","cyan","yellow","green"]
+[styles.memory]
+ram_color = "magenta"
+cache_color = "blue"
+swap_color = "green"
+arc_color = "yellow"
+gpu_colors=["magenta","red","blue","cyan","yellow","green"]
+[styles.network]
+rx_color = "magenta"
+tx_color = "blue"
+rx_total_color = "magenta"
+tx_total_color = "blue"
+[styles.battery]
+high_battery_color = "green"
+medium_battery_color = "yellow"
+low_battery_color = "red"
+[styles.tables]
+headers={color="magenta", bold = true}
+[styles.graphs]
+graph_color = "magenta"
+legend_text = {color = "magenta",bold=true}
+[styles.widgets]
+border_color = "magenta"
+selected_border_color="light magenta"
+widget_title = {color="magenta",bold=true}
+selected_text={color = "white",bg_color="light magenta"}
+disabled_text = {color = "gray"}

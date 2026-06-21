@@ -1,0 +1,478 @@
+<?xml version="1.0"?>
+<labwc_config>
+	<core>
+		<decoration>server</decoration>
+		<gap>0</gap>
+		<adaptiveSync>no</adaptiveSync>
+		<allowTearing>no</allowTearing>
+		<reuseOutputMode>no</reuseOutputMode>
+	</core>
+	<placement>
+		<policy>cursor</policy>
+	</placement>
+	<theme>
+		<name>wodk-noicon</name>
+		<cornerRadius>0</cornerRadius>
+		<keepBorder>yes</keepBorder>
+		<font place="ActiveWindow">
+			<name>Monaco</name>
+			<size>9</size>
+			<weight>bold</weight>
+		</font>
+		<font place="InactiveWindow">
+			<name>Monaco</name>
+			<size>9</size>
+		</font>
+		<font place="MenuHeader">
+			<name>Monaco</name>
+			<size>10</size>
+		</font>
+		<font place="MenuItem">
+			<name>Monaco</name>
+			<size>10</size>
+		</font>
+		<font place="OnScreenDisplay">
+			<name>Monaco</name>
+			<size>10</size>
+		</font>
+	</theme>
+	<windowSwitcher show="yes" preview="yes" outlines="yes" allworkspaces="no">
+		<fields>
+			<field content="type" width="25%"/>
+			<field content="title" width="50%"/>
+		</fields>
+	</windowSwitcher>
+	<resistance>
+		<screenEdgeStrength>16</screenEdgeStrength>
+		<windowEdgeStrength>16</windowEdgeStrength>
+	</resistance>
+	<focus>
+		<raiseOnFocus>yes</raiseOnFocus>
+	</focus>
+	<desktops>
+		<popupTime>1000</popupTime>
+		<names>
+			<name>1</name>
+			<name>2</name>
+			<name>3</name>
+			<name>4</name>
+		</names>
+	</desktops>
+	<regions>
+		<region name="1" x="0%" y="0%" width="50%" height="50%" />
+		<region name="2" x="0%" y="50%" width="50%" height="50%" />
+		<region name="3" x="50%" y="0%" width="50%" height="50%" />
+		<region name="4" x="50%" y="50%" width="50%" height="50%" />
+	</regions>
+	<keyboard>
+		<numlock>on</numlock>
+		<layoutScope>global</layoutScope>
+		<repeatRate>64</repeatRate>
+		<repeatDelay>256</repeatDelay>
+		<keybind key="XF86AudioRaiseVolume">
+			<action name="Execute">
+				<execute>amixer -qD default sset Master 5%+</execute>
+			</action>
+		</keybind>
+		<keybind key="XF86AudioLowerVolume">
+			<action name="Execute">
+				<execute>amixer -qD default sset Master 5%-</execute>
+			</action>
+		</keybind>
+		<keybind key="XF86AudioMute">
+			<action name="Execute">
+				<execute>amixer -D pipewire sset Master 1+ toggle</execute>
+			</action>
+		</keybind>
+		<keybind key="XF86MonBrightnessUp">
+			<action name="Execute">
+				<execute>brightnessctl s 5%+</execute>
+			</action>
+		</keybind>
+		<keybind key="XF86MonBrightnessDown">
+			<action name="Execute">
+				<execute>brightnessctl s 5%-</execute>
+			</action>
+		</keybind>
+		<keybind key="W-1">
+			<action name="GoToDesktop" to="1" />
+		</keybind>
+		<keybind key="W-2">
+			<action name="GoToDesktop" to="2" />
+		</keybind>
+		<keybind key="W-3">
+			<action name="GoToDesktop" to="3" />
+		</keybind>
+		<keybind key="W-4">
+			<action name="GoToDesktop" to="4" />
+		</keybind>
+		<keybind key="W-S-1">
+			<action name="SendToDesktop" to="1" follow="no" />
+		</keybind>
+		<keybind key="W-S-2">
+			<action name="SendToDesktop" to="2" follow="no" />
+		</keybind>
+		<keybind key="W-S-3">
+			<action name="SendToDesktop" to="3" follow="no" />
+		</keybind>
+		<keybind key="W-S-4">
+			<action name="SendToDesktop" to="4" follow="no" />
+		</keybind>
+		<keybind key="W-S-0">
+			<action name="ToggleOmnipresent"/>
+		</keybind>
+		<keybind key="W-s">
+			<action name="ToggleAlwaysOnTop"/>
+		</keybind>
+		<keybind key="W-d">
+			<action name="ToggleDecorations"/>
+		</keybind>
+		<keybind key="W-f">
+			<action name="ToggleFullscreen"/>
+		</keybind>
+		<keybind key="W-q">
+			<action name="Close"/>
+		</keybind>
+		<keybind key="W-S-q">
+			<action name="Iconify"/>
+		</keybind>
+		<keybind key="W-space">
+			<action name="ShowMenu" menu="client-menu"/>
+		</keybind>
+		<keybind key="W-S-d">
+			<action name="MoveToCursor" />
+		</keybind>
+		<keybind key="W-h">
+			<action name="SnapToEdge" direction="left"/>
+		</keybind>
+		<keybind key="W-j">
+			<action name="NextWindow"/>
+		</keybind>
+		<keybind key="W-k">
+			<action name="ToggleMaximize"/>
+		</keybind>
+		<keybind key="W-l">
+			<action name="SnapToEdge" direction="right"/>
+		</keybind>
+		<keybind key="W-=">
+			<action name="SnapToRegion" region="3"/>
+		</keybind>
+		<keybind key="W--">
+			<action name="SnapToRegion" region="1"/>
+		</keybind>
+		<keybind key="W-[">
+			<action name="SnapToRegion" region="2"/>
+		</keybind>
+		<keybind key="W-]">
+			<action name="SnapToRegion" region="4"/>
+		</keybind>
+		<keybind key="W-A-h">
+			<action name="MoveRelative" x="-15"/>
+		</keybind>
+		<keybind key="W-A-j">
+			<action name="MoveRelative" y="15" />
+		</keybind>
+		<keybind key="W-A-k">
+			<action name="MoveRelative" y="-15" />
+		</keybind>
+		<keybind key="W-A-l">
+			<action name="MoveRelative" x="15" />
+		</keybind>
+		<keybind key="W-A-C-h">
+			<action name="MoveRelative" x="-1" />
+		</keybind>
+		<keybind key="W-A-C-j">
+			<action name="MoveRelative" y="1" />
+		</keybind>
+		<keybind key="W-A-C-k">
+			<action name="MoveRelative" y="-1" />
+		</keybind>
+		<keybind key="W-A-C-l">
+			<action name="MoveRelative" x="1" />
+		</keybind>
+		<keybind key="W-A-S-h">
+			<action name="ResizeRelative" left="-5" right="-5" />
+		</keybind>
+		<keybind key="W-A-S-j">
+			<action name="ResizeRelative" top="-5" bottom="-5" />
+		</keybind>
+		<keybind key="W-A-S-k">
+			<action name="ResizeRelative" top="5" bottom="5" />
+		</keybind>
+		<keybind key="W-A-S-l">
+			<action name="ResizeRelative" left="5" right="5" />
+		</keybind>
+		<keybind key="W-A-S-C-h">
+			<action name="ResizeRelative" left="-1" right="-1" />
+		</keybind>
+		<keybind key="W-A-S-C-j">
+			<action name="ResizeRelative" top="-1" bottom="-1" />
+		</keybind>
+		<keybind key="W-A-S-C-k">
+			<action name="ResizeRelative" top="1" bottom="1" />
+		</keybind>
+		<keybind key="W-A-S-C-l">
+			<action name="ResizeRelative" left="1" right="1" />
+		</keybind>
+		<keybind key="W-Return">
+			<action name="Execute" command="foot" />
+			<!--<action name="Execute" command="kitty -1" />-->
+		</keybind>
+		<keybind key="W-S-l">
+			<action name="Execute" command="xfce4-popup-whiskermenu" />
+		</keybind>
+		<keybind key="W-S-;">
+			<action name="Execute" command="wmenu-run -bf 'Monaco Regular 10' -N FFFFFF -n 000000 -S EC7FAC -s FFFFFF" />
+		</keybind>
+		<keybind key="W-A-S-;">
+			<action name="Execute" command="pass-show" />
+		</keybind>
+		<keybind key="W-F10">
+			<action name="Execute" command='~/.local/xbin/qgrim.sh' />
+		</keybind>
+		<keybind key="W-S-F10">
+			<action name="Execute" command='~/.local/xbin/qgrimg.sh' />
+		</keybind>
+		<keybind key="W-F11">
+			<action name="Execute" command="~/.local/xbin/qwfrec.sh" />
+		</keybind>
+		<keybind key="W-A-F11">
+			<action name="Execute" command="~/.local/xbin/qwfrec.sh -a -C libopus --audio-backend=pipewire" />
+		</keybind>
+		<keybind key="W-S-F11">
+			<action name="Execute" command="~/.local/xbin/qwfrecg.sh" />
+		</keybind>
+		<keybind key="W-A-S-F11">
+			<action name="Execute" command="~/.local/xbin/qwfrecg.sh -a -C libopus --audio-backend=pipewire" />
+		</keybind>
+		<keybind key="W-r">
+			<action name="Execute" command="makoctl dismiss" />
+		</keybind>
+		<keybind key="W-A-S-C-r">
+			<action name="Execute" command="makoctl dismiss -a" />
+		</keybind>
+		<keybind key="W-e">
+			<action name="Execute" command="~/.local/xbin/mako-extend-toggle.sh" />
+		</keybind>
+		<keybind key="W-S-e">
+			<action name="Execute" command="yambar-toggle" />
+		</keybind>
+		<keybind key="W-x">
+			<action name="Execute" command="~/.local/xbin/togglemute.sh"/>
+		</keybind>
+		<keybind key="W-S-x">
+			<action name="Execute" command="mumble rpc togglemute"/>
+		</keybind>
+		<keybind key="W-S-p">
+			<action name="Execute" command="mpc -h /run/user/1000/mpd/socket -q toggle" />
+		</keybind>
+		<keybind key="W-S-n">
+			<action name="Execute" command="mpc -h /run/user/1000/mpd/socket -q next" />
+		</keybind>
+		<keybind key="W-S-b">
+			<action name="Execute" command="mpc -h /run/user/1000/mpd/socket -q prev" />
+		</keybind>
+		<keybind key="W-period">
+			<action name="Execute" command="wtype …" />
+		</keybind>
+		<keybind key="W-/">
+			<action name="Execute" command="wtype ¯\\_(ツ)_/¯" />
+		</keybind>
+		<keybind key="W-C-S-l">
+			<action name="Execute" command="gortlock" />
+		</keybind>
+		<keybind key="W-S-i">
+			<action name="Execute" command="swidle" />
+		</keybind>
+		<!--keybind key="C-A-S-i">
+			<action name="Execute" command="~/.local/xbin/toggleinhibit.sh 1" />
+		</keybind-->
+	</keyboard>
+	<mouse>
+		<doubleClickTime>256</doubleClickTime>
+		<context name="Frame">
+			<mousebind button="W-Left" action="Press">
+				<action name="Focus"/>
+				<action name="Raise"/>
+			</mousebind>
+			<mousebind button="W-Left" action="Click">
+				<action name="Unshade"/>
+			</mousebind>
+			<mousebind button="W-Left" action="DoubleClick">
+				<action name="ToggleMaximize"/>
+			</mousebind>
+			<mousebind button="W-Left" action="Drag">
+				<action name="Move"/>
+			</mousebind>
+			<mousebind button="W-Right" action="Press">
+				<action name="Focus"/>
+				<action name="Raise"/>
+				<action name="Unshade"/>
+			</mousebind>
+			<mousebind button="W-Right" action="Drag">
+				<action name="Resize"/>
+			</mousebind>
+			<mousebind button="W-S-Right" action="Drag">
+				<action name="Focus"/>
+				<action name="Raise"/>
+				<action name="ShowMenu" menu="client-menu"/>
+			</mousebind>
+			<mousebind button="W-Middle" action="Press">
+				<action name="Lower"/>
+				<action name="Unfocus"/>
+			</mousebind>
+			<mousebind button="W-S-Middle" action="Press">
+				<action name="Close"/>
+			</mousebind>
+		</context>
+		<context name="Top">
+			<mousebind button="Left" action="Drag">
+				<action name="Resize" />
+			</mousebind>
+		</context>
+		<context name="Left">
+			<mousebind button="Left" action="Drag">
+				<action name="Resize" />
+			</mousebind>
+		</context>
+		<context name="Right">
+			<mousebind button="Left" action="Drag">
+				<action name="Resize" />
+			</mousebind>
+		</context>
+		<context name="Bottom">
+			<mousebind button="Left" action="Drag">
+				<action name="Resize" />
+			</mousebind>
+		</context>
+		<context name="TRCorner">
+			<mousebind button="Left" action="Drag">
+				<action name="Resize" />
+			</mousebind>
+		</context>
+		<context name="BRCorner">
+			<mousebind button="Left" action="Drag">
+				<action name="Resize" />
+			</mousebind>
+		</context>
+		<context name="TLCorner">
+			<mousebind button="Left" action="Drag">
+				<action name="Resize" />
+			</mousebind>
+		</context>
+		<context name="BLCorner">
+			<mousebind button="Left" action="Drag">
+				<action name="Resize" />
+			</mousebind>
+		</context>
+		<context name="TitleBar">
+			<mousebind button="Left" action="Press">
+				<action name="Focus" />
+				<action name="Raise" />
+			</mousebind>
+			<mousebind button="Right" action="Click">
+				<action name="Focus" />
+				<action name="Raise" />
+			</mousebind>
+			<mousebind direction="Up" action="Scroll">
+				<action name="Unshade" />
+				<action name="Focus" />
+			</mousebind>
+			<mousebind direction="Down" action="Scroll">
+				<action name="Unfocus" />
+				<action name="Shade" />
+			</mousebind>
+		</context>
+		<context name="Title">
+			<mousebind button="Left" action="Drag">
+				<action name="Move" />
+			</mousebind>
+			<mousebind button="Left" action="DoubleClick">
+				<action name="ToggleMaximize" />
+			</mousebind>
+			<mousebind button="Right" action="Click">
+				<action name="ShowMenu" menu="client-menu" />
+			</mousebind>
+		</context>
+		<context name="Maximize">
+			<mousebind button="Left" action="Click">
+				<action name="ToggleMaximize" />
+			</mousebind>
+			<mousebind button="Right" action="Click">
+				<action name="ToggleMaximize" direction="horizontal" />
+			</mousebind>
+			<mousebind button="Middle" action="Click">
+				<action name="ToggleMaximize" direction="vertical" />
+			</mousebind>
+		</context>
+		<context name="WindowMenu">
+			<mousebind button="Left" action="Click">
+				<action name="ShowMenu" menu="client-menu" />
+			</mousebind>
+			<mousebind button="Right" action="Click">
+				<action name="ShowMenu" menu="client-menu" />
+			</mousebind>
+		</context>
+		<context name="Iconify">
+			<mousebind button="Left" action="Click">
+				<action name="Iconify" />
+			</mousebind>
+		</context>
+		<context name="Close">
+			<mousebind button="Left" action="Click">
+				<action name="Close" />
+			</mousebind>
+		</context>
+		<context name="Client">
+			<mousebind button="Left" action="Press">
+				<action name="Focus" />
+				<action name="Raise" />
+			</mousebind>
+			<mousebind button="Middle" action="Press">
+				<action name="Focus" />
+				<action name="Raise" />
+			</mousebind>
+			<mousebind button="Right" action="Press">
+				<action name="Focus" />
+				<action name="Raise" />
+			</mousebind>
+		</context>
+		<context name="Root">
+			<mousebind button="Right" action="Press">
+				<action name="ShowMenu" menu="root-menu" />
+			</mousebind>
+			<mousebind button="Middle" action="Press">
+				<action name="ShowMenu" menu="root-menu" />
+			</mousebind>
+			<mousebind direction="W-Left" action="Press">
+				<action name="Execute" command="foot"/>
+			</mousebind>
+			<mousebind direction="W-Right" action="Press">
+				<action name="Execute" command="fuzzel"/>
+			</mousebind>
+			<mousebind direction="W-Up" action="Scroll">
+				<action name="GoToDesktop" to="right" wrap="yes" />
+			</mousebind>
+			<mousebind direction="W-Down" action="Scroll">
+				<action name="GoToDesktop" to="left" wrap="yes" />
+			</mousebind>
+		</context>
+	</mouse>
+	<touch deviceName="" mapToOutput="" />
+	<tablet mapToOutput="" rotate="0">
+		<area top="0.0" left="0.0" width="0.0" height="0.0" />
+		<map button="Tip" to="Left" />
+		<map button="Stylus" to="Right" />
+		<map button="Stylus2" to="Middle" />
+	</tablet>
+	<libinput>
+		<device category="default">
+			<tap>no</tap>
+			<tapAndDrag>no</tapAndDrag>
+			<disableWhileTyping>no</disableWhileTyping>
+		</device>
+	</libinput>
+	<menu>
+		<ignoreButtonReleasePeriod>250</ignoreButtonReleasePeriod>
+	</menu>
+</labwc_config>

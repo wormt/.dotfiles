@@ -1,0 +1,17 @@
+screen-list=playlist,browse,library,search,song,keydef,help
+color background=7
+color title=7/13
+color title-bold=7/13,bold
+color line=7/13
+color line-flags=7/13
+color list=13/7
+color list-bold=13/7,bold
+color browser-directory=13/7
+color browser-playlist=13/7
+color progressbar=7/13
+color progressbar-background=13
+color status-state=7/13,bold
+color status-song=7/13
+color status-time=7/13
+color alert=7/9
+color input=0

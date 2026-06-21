@@ -1,0 +1,22 @@
+#!/bin/sh
+if [ -w "$XDG_CONFIG_HOME"/sfwbar/wfs ];then
+	rm -f "$XDG_CONFIG_HOME"/sfwbar/wfs
+fi
+if [ -w "$XDG_CONFIG_HOME"/polybar/wfs ];then
+	rm -f "$XDG_CONFIG_HOME"/polybar/wfs
+fi
+#gsettings set org.gnome.desktop.interface cursor-theme 'Adwaita'
+#gsettings set org.gnome.desktop.interface cursor-size 16
+#gsettings set org.gnome.desktop.default-applications.terminal exec 'foot'
+#gsettings set org.gnome.desktop.default-applications.terminal exec-arg '-T foot'
+wlsunset -l 37 -L -117 -t 3000&
+mako&
+swaybgrl.sh&
+#mpd --kill;mpd --no-daemon&
+#sfwbar&
+/usr/libexec/xdg-desktop-portal-wlr&
+/usr/libexec/xdg-desktop-portal-gtk&
+n="$(wlr-randr|awk '{ FS="-" } /ASUSTek COMPUTER INC ASUS PA279 0x0001E0D2/ { $0 = $1;FS=" ";print $3 }')"
+wlr-randr --output eDP-1 --mode 1920x1080 --left-of DP-"$n" --on&
+wlr-randr --output HDMI-A-"$n" --mode 2560x1440 --scale 1.25 --on&
+swayidle -w timeout 300 "nini" resume "nini 0" timeout 900 "swaylock;sleep 1.5;wlr-randr --output eDP-1 --off --output DP-$n --off" resume "wlr-randr --output eDP-1 --mode 1920x1080 --left-of DP-$n --on --output DP-$n --mode 2560x1440 --scale 1.25 --right-of eDP-1 --on"

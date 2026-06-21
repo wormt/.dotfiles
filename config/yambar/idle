@@ -1,0 +1,2 @@
+#!/bin/sh
+printf "idle|bool|$(if [ $(pgrep -x swayidle) ];then printf 'true';else printf 'false';fi)\n\n"

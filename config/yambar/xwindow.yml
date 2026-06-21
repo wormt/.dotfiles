@@ -1,0 +1,158 @@
+bar:
+ monitor: eDP1
+ height: 16
+ location: top
+ background: ffffffff
+ foreground: 000000ff
+ font: Monaco:size=12
+ #font: mononoki:size=14
+ trackpad-sensitivity: 8
+ left:
+  - xwindow:
+     content: {string: {text: " {title}",max: 64}}
+ center:
+  - mpd:
+     host: /tmp/1000/mpd/socket
+     content:
+      map:
+       conditions:
+        state != "playing": {empty: {}}
+        state == "playing":
+         map:
+          conditions:
+           album != "": {string: {text: "{artist} - {album} - {title}",max: 99}}
+           album == "": {string: {text: "{artist} - {title}",max: 99}}
+ right:
+  - alsa:
+     card: pipewire
+     mixer: Master
+     content:
+      map:
+       on-click:
+        left: /bin/sh -c "$HOME/.config/yambar/open_pavu_control"
+       #left: /bin/sh -c "wgv 1%+"
+       #right: /bin/sh -c "wgv 1%-"
+        middle: /bin/sh -c "amixer -D default:0 sset Master 1+ toggle"
+        wheel-up: /bin/sh -c "wgv 1%+"
+        wheel-down: /bin/sh -c "wgv 1%-"
+       conditions:
+        online && ~muted:
+         ramp:
+          tag: volume
+          items:
+           - string: {text: "[{percent}]",foreground: 000000ff,deco: {background: {color: ec7facff}}}
+           - string: {text: "[{percent}]",foreground: 000000ff,deco: {background: {color: ec7facff}}}
+           - string: {text: "[{percent}]",foreground: 000000ff,deco: {background: {color: ec7facff}}}
+        online && muted: {string: {text: "{ {percent}}",foreground: 000000ff,deco: {background: {color: ff4c4cff}}}}
+        ~online: {string: {text: "{!!}",foreground: 000000ff,deco: {background: {color: ff4c4cff}}}}
+  - battery:
+     name: BAT0
+     poll-interval: 9999
+     content:
+      map:
+       conditions:
+        state == "full": {string: {text: "[yay|",foreground: 000000ff,deco: {background: {color: 80ff80ff}}}}
+        state == "charging":
+         ramp:
+          tag: capacity
+          items:
+           - string: {text: "[{capacity}+|",foreground: 000000ff,deco: {background: {color: ff4c4cff}}}
+           - string: {text: "[{capacity}+|",foreground: 000000ff,deco: {background: {color: ff9c33ff}}}
+           - string: {text: "[{capacity}+|",foreground: 000000ff,deco: {background: {color: ff9c33ff}}}
+           - string: {text: "[{capacity}+|",foreground: 000000ff,deco: {background: {color: 80ff80ff}}}
+           - string: {text: "[{capacity}+|",foreground: 000000ff,deco: {background: {color: 80ff80ff}}}
+        state == "discharging":
+         ramp:
+          tag: capacity
+          items:
+           - string: {text: "[{capacity}-:{estimate}|",foreground: 000000ff,deco: {background: {color: ff4c4cff}}}
+           - string: {text: "[{capacity}-:{estimate}|",foreground: 000000ff,deco: {background: {color: ff9c33ff}}}
+           - string: {text: "[{capacity}-:{estimate}|",foreground: 000000ff,deco: {background: {color: ff9c33ff}}}
+           - string: {text: "[{capacity}-:{estimate}|",foreground: 000000ff,deco: {background: {color: 80ff80ff}}}
+           - string: {text: "[{capacity}-:{estimate}|",foreground: 000000ff,deco: {background: {color: 80ff80ff}}}
+        state == "not charging":
+         ramp:
+          tag: capacity
+          items:
+           - string: {text: "[{capacity}=|",foreground: 000000ff,deco: {background: {color: ff4c4cff}}}
+           - string: {text: "[{capacity}=|",foreground: 000000ff,deco: {background: {color: ff9c33ff}}}
+           - string: {text: "[{capacity}=|",foreground: 000000ff,deco: {background: {color: ff9c33ff}}}
+           - string: {text: "[{capacity}=|",foreground: 000000ff,deco: {background: {color: 80ff80ff}}}
+           - string: {text: "[{capacity}=|",foreground: 000000ff,deco: {background: {color: 80ff80ff}}}
+           - string: {text: "[{capacity}=|",foreground: 000000ff,deco: {background: {color: 80ff80ff}}}
+        state == "unknown":
+         ramp:
+          tag: capacity
+          items:
+           - string: {text: "[{capacity}?|",foreground: 000000ff,deco: {background: {color: ff4c4cff}}}
+           - string: {text: "[{capacity}?|",foreground: 000000ff,deco: {background: {color: ff9c33ff}}}
+           - string: {text: "[{capacity}?|",foreground: 000000ff,deco: {background: {color: ff9c33ff}}}
+           - string: {text: "[{capacity}?|",foreground: 000000ff,deco: {background: {color: 80ff80ff}}}
+           - string: {text: "[{capacity}?|",foreground: 000000ff,deco: {background: {color: 80ff80ff}}}
+  - battery:
+     name: BAT1
+     poll-interval: 9999
+     content:
+      map:
+       conditions:
+        state == "full": {string: {text: "yay]",foreground: 000000ff,deco: {background: {color: 80ff80ff}}}}
+        state == "charging":
+         ramp:
+          tag: capacity
+          items:
+           - string: {text: "{capacity}+]",foreground: 000000ff,deco: {background: {color: ff4c4cff}}}
+           - string: {text: "{capacity}+]",foreground: 000000ff,deco: {background: {color: ff9c33ff}}}
+           - string: {text: "{capacity}+]",foreground: 000000ff,deco: {background: {color: ff9c33ff}}}
+           - string: {text: "{capacity}+]",foreground: 000000ff,deco: {background: {color: 80ff80ff}}}
+           - string: {text: "{capacity}+]",foreground: 000000ff,deco: {background: {color: 80ff80ff}}}
+        state == "discharging":
+         ramp:
+          tag: capacity
+          items:
+           - string: {text: "{capacity}-:{estimate}]",foreground: 000000ff,deco: {background: {color: ff4c4cff}}}
+           - string: {text: "{capacity}-:{estimate}]",foreground: 000000ff,deco: {background: {color: ff9c33ff}}}
+           - string: {text: "{capacity}-:{estimate}]",foreground: 000000ff,deco: {background: {color: ff9c33ff}}}
+           - string: {text: "{capacity}-:{estimate}]",foreground: 000000ff,deco: {background: {color: 80ff80ff}}}
+           - string: {text: "{capacity}-:{estimate}]",foreground: 000000ff,deco: {background: {color: 80ff80ff}}}
+        state == "not charging":
+         ramp:
+          tag: capacity
+          items:
+           - string: {text: "{capacity}=]",foreground: 000000ff,deco: {background: {color: ff4c4cff}}}
+           - string: {text: "{capacity}=]",foreground: 000000ff,deco: {background: {color: ff9c33ff}}}
+           - string: {text: "{capacity}=]",foreground: 000000ff,deco: {background: {color: ff9c33ff}}}
+           - string: {text: "{capacity}=]",foreground: 000000ff,deco: {background: {color: 80ff80ff}}}
+           - string: {text: "{capacity}=]",foreground: 000000ff,deco: {background: {color: 80ff80ff}}}
+           - string: {text: "{capacity}=]",foreground: 000000ff,deco: {background: {color: 80ff80ff}}}
+        state == "unknown":
+         ramp:
+          tag: capacity
+          items:
+           - string: {text: "{capacity}?]",foreground: 000000ff,deco: {background: {color: ff4c4cff}}}
+           - string: {text: "{capacity}?]",foreground: 000000ff,deco: {background: {color: ff9c33ff}}}
+           - string: {text: "{capacity}?]",foreground: 000000ff,deco: {background: {color: ff9c33ff}}}
+           - string: {text: "{capacity}?]",foreground: 000000ff,deco: {background: {color: 80ff80ff}}}
+           - string: {text: "{capacity}?]",foreground: 000000ff,deco: {background: {color: 80ff80ff}}}
+  - network:
+     content:
+      map:
+       conditions:
+        name == wlan0 && state != "up":
+         map:
+          default: {string: {text: "[{name}]",foreground: 000000ff,deco: {background: {color: ff4c4cff}}}}
+          conditions:
+           name == eth0 && state == "up": {string: {text: "[{name}]",foreground: 000000ff,deco: {background: {color: ffff4dff}}}}
+        name == wlan0 && state == "up":
+         map:
+          default: {string: {text: "[{name}]",foreground: 000000ff,deco: {background: {color: ffff4dff}}}}
+          conditions:
+           name == eth0 && state == "up": {string: {text: "[{name}]",foreground: 000000ff,deco: {background: {color: ffff4dff}}}}
+  - network:
+     content:
+      map:
+       conditions:
+        (name == airvpn || name == vpn || name == sa || name == tg || name == gb || name == tun0) && state != "down": {string: {text: "[{name}]",foreground: 000000ff,deco: {background: {color: d779a6ff}}}}
+  - clock:
+     date-format: "%a %d|%I:%M"
+     content:
+       - string: {text: "[{date}]",foreground: 000000ff,deco: {background: {color: 66b5ffff}}}

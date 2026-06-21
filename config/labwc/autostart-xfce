@@ -1,0 +1,7 @@
+gsettings set org.gnome.desktop.interface cursor-theme 'Adwaita'
+gsettings set org.gnome.desktop.interface cursor-size 16
+gsettings set org.gnome.desktop.default-applications.terminal exec 'foot'
+gsettings set org.gnome.desktop.default-applications.terminal exec-arg '-T foot'
+/usr/libexec/xdg-desktop-portal-wlr&
+/usr/libexec/xdg-desktop-portal-gtk&
+sleep 10;~/.local/xbin/wbgwallrl.sh&

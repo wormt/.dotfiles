@@ -1,0 +1,7 @@
+#!/bin/sh
+if [ ! -z "$(pavucontrol-qt)" ]
+then
+	pavucontrol-qt
+else
+	pkill pavucontrol-qt
+fi

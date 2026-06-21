@@ -1,0 +1,26 @@
+* {
+	background: transparent;
+	foreground: Black;
+	selected-normal-background: #ec7fac;
+	selected-normal-foreground: #ffffff;
+	normal-background: #ffffff00;
+	alternate-normal-background: #00000006;
+	border-color: @foreground;
+	font: "Monaco 14";
+}
+window {
+	transparency: "real";
+	height:40%;
+	width:30%;
+	padding:0;
+	border:2px;
+	border-radius:5px;
+	background-color: #ffffffdf;
+}
+listview {
+	scrollbar: false;
+	lines:20;
+}
+element {
+	children: [element-icon, element-text];
+}

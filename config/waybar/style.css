@@ -1,0 +1,8 @@
+* {
+    color: black;
+	background: white;
+}
+
+#taskbar,#mpd,#tray,#network,#battery,#clock {
+	margin-top: -50px; margin-bottom: -50px
+}

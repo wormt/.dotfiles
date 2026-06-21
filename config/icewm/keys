@@ -1,0 +1,9 @@
+key "Super+Enter" mlterm -e pwsh -NoLogo
+key "Super+Shift+L" rofi -show drun
+key "Super+R" dunstctl close
+key "Super+Shift+R" dunstctl close-all
+key "Super+Shift+x" flatpak run info.mumble.Mumble rpc togglemute
+key "Super+Shift+p" mpc -q toggle
+key "Super+Shift+n" mpc -q next
+key "Super+Shift+b" mpc -q prev
+key "Super+period" echo '…' | xclip

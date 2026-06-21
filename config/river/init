@@ -1,0 +1,126 @@
+#!/bin/sh
+export LD_PRELOAD="/usr/lib/libmimalloc.so.2.1"
+if ! mountpoint -q $HOME/sshfs;then sshfs -o idmap=user -o follow_symlinks -o uid=1000 -o gid=1000 sshfs:/opt/sshfs/sshfs $HOME/sshfs;fi
+riverctl map normal Super Return spawn foot
+riverctl map normal Super+Shift Return spawn 'foot -c $XDG_CONFIG_HOME/foot/dark.ini -o term=xterm'
+riverctl map normal Super+Alt+Shift Return spawn 'foot -a "float"'
+riverctl map normal Super+Alt+Shift+Control Return spawn 'foot -o colors.alpha=0.66 -a "float" sh -c kpxclipc;exit'
+riverctl map normal Super+Shift L spawn 'fuzzel'
+riverctl map normal Super+Shift P spawn 'mpc toggle'
+riverctl map normal Super+Shift N spawn 'mpc next'
+riverctl map normal Super+Shift B spawn 'mpc prev'
+riverctl map normal Super+Shift D spawn 'makoctl dismiss -a'
+riverctl map normal Super+Shift+Control D spawn 'if [ "$(makoctl mode)" = default ] || [ "$(makoctl mode)" = big ] || [ "$(makoctl mode)" = smol ];then makoctl mode -s dnd;else makoctl mode -s default;fi'
+riverctl map normal Super+Shift S spawn 'if [ "$(makoctl mode)" = big ]; then makoctl mode -s default;elif [ "$(makoctl mode)" = default ]; then makoctl mode -s smol;else notify-send bad\ crop;fi'
+riverctl map normal Super+Shift A spawn 'if [ "$(makoctl mode)" = smol ]; then makoctl mode -s default;elif [ "$(makoctl mode)" = default ]; then makoctl mode -s big;else notify-send bad\ crop;fi'
+riverctl map normal Super+Shift W spawn 'PID="$(pgrep wbg -d\ )";exec wbg $(find $HOME/pic/hh -name "*.jpg" -o -name "*.png" -o -name "*.webp"|shuf -n 1)&sleep 0.06;/usr/bin/kill $PID'
+riverctl map normal Super+Shift X spawn 'if [ ! -z $(pgrep mumble) ]; then mumble rpc togglemute;fi'
+riverctl map normal Super+Shift+Control X spawn 'if [ ! -z $(pgrep mumble) ]; then mumble rpc toggledeaf;fi'
+riverctl map normal Super+Shift I spawn 'if [ -z "$(pgrep -x swayidle)" ];then exec swayidle -w timeout 300 "doas /usr/local/bin/nini" resume "doas /usr/ocal/bin/nini 0" timeout 900 "swaylock" timeout 3600 "wlopm --off eDP-1" resume "wlopm --on eDP-1";else pkill -x swayidle;fi'
+riverctl map normal Super T spawn 'wtype þ'
+riverctl map normal Super+Shift T spawn 'wtype Þ'
+riverctl map normal Super Period spawn 'wtype …'
+riverctl map normal Super Q close
+riverctl map-pointer normal Super BTN_MIDDLE close
+riverctl map normal Super+Shift Q exit
+riverctl map normal Super J focus-view next
+riverctl map normal Super K focus-view previous
+riverctl map normal Super+Shift J swap next
+riverctl map normal Super+Shift K swap previous
+#riverctl map normal Super Period focus-output next
+#riverctl map normal Super Comma focus-output previous
+riverctl map normal Super+Shift Period send-to-output next
+riverctl map normal Super+Shift Comma send-to-output previous
+riverctl map normal Super H send-layout-cmd wideriver "--ratio -0.05"
+riverctl map normal Super L send-layout-cmd wideriver "--ratio +0.05"
+riverctl map normal Super+Control H send-layout-cmd wideriver "--ratio -0.01"
+riverctl map normal Super+Control L send-layout-cmd wideriver "--ratio +0.01"
+#riverctl map normal Super bracketleft send-layout-cmd wideriver "all_padding -5"
+#riverctl map normal Super bracketright send-layout-cmd wideriver "all_padding +5"
+#riverctl map normal Super bracketleft send-layout-cmd wideriver "--count-master 1"
+#riverctl map normal Super bracketright send-layout-cmd wideriver "--count-master 2"
+riverctl map normal Super+Alt H move left 100
+riverctl map normal Super+Alt J move down 100
+riverctl map normal Super+Alt K move up 100
+riverctl map normal Super+Alt L move right 100
+riverctl map normal Super+Alt+Control H snap left
+riverctl map normal Super+Alt+Control J snap down
+riverctl map normal Super+Alt+Control K snap up
+riverctl map normal Super+Alt+Control L snap right
+riverctl map normal Super+Alt+Shift H resize horizontal -100
+riverctl map normal Super+Alt+Shift J resize vertical 100
+riverctl map normal Super+Alt+Shift K resize vertical -100
+riverctl map normal Super+Alt+Shift L resize horizontal 100
+riverctl map normal Super+Alt+Shift+Control H resize horizontal -1
+riverctl map normal Super+Alt+Shift+Control J resize vertical 1
+riverctl map normal Super+Alt+Shift+Control K resize vertical -1
+riverctl map normal Super+Alt+Shift+Control L resize horizontal 1
+riverctl map-pointer normal Super BTN_LEFT move-view
+riverctl map-pointer normal Super BTN_RIGHT resize-view
+for i in $(seq 1 9); do
+	tags=$((1 << ($i - 1)))
+	riverctl map normal Super $i set-focused-tags $tags
+	riverctl map normal Super+Shift $i set-view-tags $tags
+	riverctl map normal Super+Control $i toggle-focused-tags $tags
+	riverctl map normal Super+Shift+Control $i toggle-view-tags $tags
+done
+all_tags=$(((1 << 9) - 1))
+riverctl map normal Super 0 set-focused-tags $all_tags
+riverctl map normal Super+Shift 0 set-view-tags $all_tags
+riverctl map normal Super D toggle-float
+riverctl map normal Super F toggle-fullscreen
+riverctl map normal Super+Shift F spawn 'if [ ! -w $XDG_CONFIG_HOME/yambar/wfs ];then pkill -x yambar;riverctl border-width 0;mv $XDG_CONFIG_HOME/river/wfs0 $XDG_CONFIG_HOME/river/wfs1;elif [ -w $XDG_CONFIG_HOME/yambar/wfs ];then exec yambar&riverctl border-width 1;rm -f $XDG_CONFIG_HOME/yambar/wfs;fi'
+if [ -w $XDG_CONFIG_HOME/yambar/wfs ]; then
+	rm -f $XDG_CONFIG_HOME/yambar/wfs
+fi
+riverctl map normal Super Right send-layout-cmd wideriver "--layout right"
+riverctl map normal Super Left  send-layout-cmd wideriver "--layout left"
+for mode in normal locked; do
+	riverctl map $mode None XF86AudioRaiseVolume spawn 'wgv 5%+'
+	riverctl map $mode None XF86AudioLowerVolume spawn 'wgv 5%-'
+	riverctl map $mode None XF86AudioMute spawn 'amixer -D pipewire sset Master 1+ toggle'
+	for key in XF86MonBrightnessUp XF86MonBrightnessDown; do
+		riverctl map $mode None $key spawn 'brightnessctl --quiet get >> "$XDG_CACHE_HOME/wlu"'
+	done
+done
+riverctl map normal Super F10 spawn 'exec grim ~/pic/screenshots/g"$(date +"%Y%m%d%H%M%S")".png' #screenshot
+riverctl map normal Super+Shift F10 spawn 'exec grim -g "$(slurp)" ~/pic/screenshots/g"$(date +"%Y%m%d%H%M%S")".png' #screenshot selection
+riverctl map normal Super F11 spawn 'exec wf-recorder -x yuv420p -o eDP-1 -f rec.mp4' #record
+riverctl map normal Super+Alt F11 spawn 'exec wf-recorder -x yuv420p -a -o eDP-1 -f rec.mp4' #record with audio
+riverctl map normal Super+Shift F11 spawn 'exec wf-recorder -x yuv420p -o eDP-1 -g "$(slurp)" -f rec.mp4' #record selection
+riverctl map normal Super+Alt+Shift F11 spawn 'exec wf-recorder -x yuv420p -a -o eDP-1 -g "$(slurp)" -f rec.mp4' #record selection with audio
+riverctl map normal Super+Control F11 spawn 'exec pkill -SIGINT wf-recorder' #stop recording
+riverctl input pointer-1267-12573-PNP0C50:00_04F3:311D_Touchpad disable-while-typing disabled
+riverctl input pointer-2-7-SynPS/2_Synaptics_TouchPad disable-while-typing disabled
+riverctl xcursor-theme GoogleDot-Pink 24
+gsettings set org.gnome.desktop.interface cursor-theme 'GoogleDot-Pink'
+riverctl focus-follows-cursor normal
+riverctl hide-cursor when-typing enabled
+riverctl set-cursor-warp on-focus-change
+riverctl attach-mode bottom
+riverctl border-color-focused 0xec7fac
+riverctl border-color-unfocused 0xd4d4d4
+riverctl background-color 0xffffff
+riverctl border-width 1
+riverctl set-repeat 99 250
+for title in *KeePassXC* Friends\ List Steam\ setup Steam\ Settings Volume\ Control wev; do
+	echo "riverctl rule-add -title \"$title\" float"|sh
+done
+riverctl rule-add -app-id float float
+riverctl rule-add ssd
+riverctl default-layout wideriver
+rm -f "$XDG_CACHE_HOME/wlu" "$XDG_CACHE_HOME/wgv"
+touch "$XDG_CACHE_HOME/wlu" "$XDG_CACHE_HOME/wgv"
+brightnessctl -q get > "$XDG_CACHE_HOME/wlu"
+#exec stacktile --remainder-sublayout dwindle --inner-padding 0 --outer-padding 0&
+exec wideriver --border-width 1 --border-color-focused 0xec7fac --border-color-unfocused 0xd4d4d4 --stack dwindle&
+pipewire&
+mpd --no-daemon&
+#wlsunset -l 37 -L -117 -t 3000&
+mako&
+wbg $(ls -d1 "$HOME"/pic/hh/*.*|shuf -n 1)&
+uutils-tail -f "$XDG_CACHE_HOME/wlu"|wob -c "$XDG_CONFIG_HOME/wob/wlu.ini"&
+uutils-tail -f "$XDG_CACHE_HOME/wgv"|wob&
+sleep .5;yambar&
+/usr/libexec/xdg-desktop-portal-wlr&
+swayidle -w timeout 300 "doas /usr/local/bin/nini" resume "doas /usr/local/bin/nini 0" timeout 900 "swaylock" timeout 3600 "wlopm --off eDP-1" resume "wlopm --on eDP-1"

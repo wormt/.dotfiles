@@ -1,0 +1,24 @@
+Module("mpd")
+
+layout {
+	style = "module"
+	label {
+		value = "['"+Mpd("artist")+"'";
+		trigger = "mpd"
+		style = "mpd_label"
+	}
+	label {
+		value = ",'"+Mpd("album")+"'";
+		trigger = "mpd"
+		style = "mpd_label"
+	}
+	label {
+		value = ",'"+Mpd("title")+"']";
+		trigger = "mpd"
+		style = "mpd_label"
+	}
+}
+
+label#mpd_label {
+	color: @theme_text_color;
+}

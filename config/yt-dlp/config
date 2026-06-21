@@ -1,0 +1,8 @@
+--external-downloader-args aria2c:'-k 1M -x 16 -j 16  -s 16'
+--embed-chapters
+--sponsorblock-mark 'sponsor,selfpromo'
+--no-mtime
+--restrict-filenames
+--trim-filenames 64
+-o %(release_date>%y%m%d,upload_date>%y%m%d|)s%(channel|)s%(title)s.%(ext)s
+-P ~/dl/ytdl
