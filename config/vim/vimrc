@@ -201,17 +201,22 @@ g:ale_disable_lsp = 1
 g:ale_linters_explicit = 1
 g:ale_fix_on_save = 1
 g:ale_fixers = {
-  \ 'python':   ['ruff', 'ruff_format'],
-  \ 'json':     ['prettier'],
-  \ 'jsonc':    ['prettier'],
-  \ 'javascript': ['prettier'],
-  \ 'typescript': ['prettier'],
+  \ 'zig':        ['zigfmt'],
+  \ 'rust':       ['rustfmt'],
+  \ 'go':         ['goimports', 'gofmt'],
+  \ 'c':          ['clang-format'],
+  \ 'cpp':        ['clang-format'],
+  \ 'cmake':      ['cmake-format'],
+  \ 'python':     ['ruff', 'ruff_format'],
+  \ 'sh':         ['shfmt'],
+  \ 'bash':       ['shfmt'],
   \ 'terraform':  ['terraform'],
-  \ 'go':     ['goimports', 'gofmt'],
-  \ 'rust':     ['rustfmt'],
-  \ 'zig':    ['zigfmt'],
-  \ 'sh':     ['shfmt'],
-  \ 'bash':     ['shfmt'],
+  \ 'typescript': ['prettier'],
+  \ 'javascript': ['prettier'],
+  \ 'html':       ['prettier'],
+  \ 'css':        ['prettier'],
+  \ 'json':       ['prettier'],
+  \ 'jsonc':      ['prettier'],
   \ }
 
 au BufRead,BufNewFile *.vrl setlocal filetype=vrl
