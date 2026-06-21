@@ -465,6 +465,10 @@ def RegisterLspServers()
     call add(servers, {'name': 'csharp-ls', 'filetype': ['cs'], 'path': 'csharp-ls', 'args': []})
   endif
 
+  if executable('clangd')
+    call add(servers, {'name': 'clangd', 'filetype': ['c', 'cpp', 'objc', 'objcpp', 'cuda'], 'path': 'clangd', 'args': ['--background-index']})
+  endif
+
   if executable('promql-langserver')
     call add(servers, {'name': 'promql', 'filetype': ['promql'], 'path': 'promql-langserver', 'args': ['--config-file', expand('~/.config/promql-langserver.yaml')]})
   endif
