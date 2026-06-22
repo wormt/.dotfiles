@@ -150,6 +150,7 @@ augroup lsp_options
     \ 'showDiagWithVirtualText': v:false,
     \ 'highlightDiagInline': v:true,
     \ 'showDiagInPopup': v:false,
+    \ 'showDiagOnStatusLine': v:true,
     \ 'autoHighlightDiags': v:true,
     \ 'autoHighlight': v:true,
     \ 'semanticHighlight': v:true,

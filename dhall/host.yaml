@@ -1,0 +1,4 @@
+---
+halloy:
+  config: "~/.config/halloy/config.toml"
+  theme: "~/.config/halloy/themes/ayu-dark.toml"

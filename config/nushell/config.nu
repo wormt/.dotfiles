@@ -28,6 +28,9 @@ $env.XKB_DEFAULT_LAYOUT = "us"
 $env.RLIMIT_RTPRIO = "88"
 
 $env.PATH = $env.PATH | prepend [($env.HOME + "/.local/bin"),"/home/linuxbrew/.linuxbrew/bin",($env.HOME + "/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/"),($env.HOME + "/.cargo/bin"),($env.HOME + "/.dotnet/tools"),($env.HOME + "/.local/share/fnm/node-versions/lts/installation/bin")] | uniq
+if 'DEVSHELL_DIR' in $env {
+  $env.PATH = ($env.PATH | prepend $"($env.DEVSHELL_DIR)/bin")
+}
 $env.XDG_DATA_HOME = $env.HOME + "/.local/share"
 $env.XDG_CONFIG_HOME = $env.HOME + "/.config"
 $env.XDG_STATE_HOME = $env.HOME + "/.local/state"

@@ -1,0 +1,3 @@
+{ theme       : Text
+, host        : Text
+}
