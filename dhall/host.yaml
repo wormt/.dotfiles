@@ -1,4 +1,10 @@
 ---
 halloy:
-  config: "~/.config/halloy/config.toml"
-  theme: "~/.config/halloy/themes/ayu-dark.toml"
+  format: toml
+  outputs:
+    config: "~/.config/halloy/config.toml"
+    theme: "~/.config/halloy/themes/ayu-dark.toml"
+ghostty:
+  format: key_eq_value
+  outputs:
+    config: "~/.config/ghostty/config"

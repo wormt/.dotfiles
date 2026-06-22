@@ -1,3 +1,5 @@
-{ theme       = "ayu-dark"
-, host        = "navi"
+{
+  theme       = < Ayu >.Ayu,
+  host        = "navi",
+  theme_name  = None Text,
 } : ./Globals.dhall
