@@ -1,5 +1,1 @@
-{
-  theme       : < Ayu >,
-  host        : Text,
-  theme_name  : Optional Text,
-}
+{ theme : < Ayu >, host : Text, theme_name : Optional Text }
