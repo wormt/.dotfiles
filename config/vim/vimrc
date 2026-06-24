@@ -508,6 +508,13 @@ augroup hcl_fmt
   endif
 augroup END
 
+augroup dhall_fmt
+  au!
+  if executable('dhall')
+    autocmd FileType dhall setlocal formatprg=dhall\ format\ -
+  endif
+augroup END
+
 if executable('ansible-language-server')
   augroup lsp_ansible_detect
     au!
