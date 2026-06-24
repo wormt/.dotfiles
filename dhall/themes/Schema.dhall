@@ -18,4 +18,6 @@
 , blue : Text
 , blue_light : Text
 , white : Text
+, halloy : Text
+, ghostty : Text
 }

@@ -1,8 +1,9 @@
-\(globals : ../globals/Globals.dhall) ->
+\(globals : ../globals/Globals.dhall ) ->
+\(pallete : ../themes/Schema.dhall ) ->
   { buffer =
     { nickname.color = "unique"
     , server_messages =
-      { change_nick = 600, join = 600, part = 600, quit = 600 }
+      { change_nick = {smart = 600}, join = {smart = 600}, part = {smart = 600}, quit = {smart = 600} }
     , typing.font_size = 12
     }
   , font = { line_height = 1.15, size = 12 }
@@ -14,5 +15,5 @@
     , sasl.plain = { username = "iwr", password_file = "password.txt" }
     , server = "domain.com"
     }
-  , theme = globals.theme
+  , theme = pallete.halloy
   }

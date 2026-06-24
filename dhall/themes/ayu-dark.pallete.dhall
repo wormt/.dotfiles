@@ -18,5 +18,7 @@
   , blue = "#36A3D9"
   , blue_light = "#5CCFE6"
   , white = "#FFFFFF"
+  , halloy = "ayu-dark"
+  , ghostty = "Ayu"
   }
 : ./Schema.dhall

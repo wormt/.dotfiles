@@ -24,6 +24,12 @@ for app in (open host.yaml | transpose key value) {
 
         let record = $data | get $app.key | get $out.subkey
 
+        if $format == "raw_transient" {
+          $record | dconf load /
+          print $"($app.key) loaded."
+          break
+        }
+
         let dest = ($out.dest | path expand)
         mkdir ($dest | path dirname)
 

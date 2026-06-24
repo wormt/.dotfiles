@@ -1,1 +1,1 @@
-{ theme = < Ayu >.Ayu, host = "navi", theme_name = None Text } : ./Globals.dhall
+{ host = "navi", uid = "6969" } : ./Globals.dhall

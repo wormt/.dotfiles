@@ -8,3 +8,7 @@ ghostty:
   format: key_eq_value
   outputs:
     config: "~/.config/ghostty/config"
+dconf:
+  format: raw_transient
+  outputs:
+    config: "~/.config/dconf/dconf.tmp"
