@@ -1,4 +1,4 @@
-\( pallete : ../themes/Schema.dhall ) ->
+\(pallete : ../themes/Schema.dhall) ->
   { theme = pallete.ghostty
   , font-family = "monospace"
   , font-size = "10"
