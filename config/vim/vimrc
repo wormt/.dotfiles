@@ -202,53 +202,37 @@ g:ale_disable_lsp = 1
 g:ale_linters_explicit = 1
 g:ale_fix_on_save = 1
 g:ale_fixers = {
-  \ 'zig':        ['zigfmt'],
-  \ 'rust':       ['rustfmt'],
-  \ 'go':         ['goimports', 'gofmt'],
-  \ 'c':          ['clang-format'],
-  \ 'cpp':        ['clang-format'],
-  \ 'cmake':      ['cmake-format'],
-  \ 'python':     ['ruff', 'ruff_format'],
-  \ 'sh':         ['shfmt'],
-  \ 'bash':       ['shfmt'],
-  \ 'terraform':  ['terraform'],
-  \ 'typescript': ['prettier'],
-  \ 'javascript': ['prettier'],
-  \ 'html':       ['prettier'],
-  \ 'css':        ['prettier'],
-  \ 'json':       ['prettier'],
-  \ 'jsonc':      ['prettier'],
-  \ }
+    'zig':        ['zigfmt'],
+    'rust':       ['rustfmt'],
+    'go':         ['goimports', 'gofmt'],
+    'c':          ['clang-format'],
+    'cpp':        ['clang-format'],
+    'cmake':      ['cmake-format'],
+    'gleam':      ['gleam_format'],
+    'python':     ['ruff', 'ruff_format'],
+    'sh':         ['shfmt'],
+    'bash':       ['shfmt'],
+    'terraform':  ['terraform'],
+    'hcl':        ['packer-fmt', 'terraform-fmt'],
+    'dhall':      ['dhall-format'],
+    'jinja':      ['j2lint'],
+    'typescript': ['prettier'],
+    'javascript': ['prettier'],
+    'html':       ['prettier'],
+    'css':        ['prettier'],
+    'json':       ['prettier'],
+    'jsonc':      ['prettier'],
+    'sql':        ['sqlfluff'],
+}
 
-au BufRead,BufNewFile *.vrl setlocal filetype=vrl
-if executable('vrl')
-  autocmd FileType vrl setlocal makeprg=vrl\ --program\ %\ --input\ /dev/null
-elseif executable('vector')
-  autocmd FileType vrl setlocal makeprg=vector\ vrl\ --program\ %\ --input\ /dev/null
-endif
+var fixer_args = {
+    'rust_rustfmt_options': '--edition 2024 --style-edition 2024',
+    'sql_sqlfluff_options': '--dialect ansi',
+}
 
-def SqlFluffFormat()
-  var view = winsaveview()
-  var src  = getline(1, '$')
-  var out  = systemlist('sqlfluff format --dialect ansi -', src)
-  if v:shell_error == 0 && !empty(out)
-    if out !=# src
-      deletebufline('%', 1, '$')
-      setline(1, out)
-    endif
-  else
-    echohl WarningMsg | echom 'sqlfluff: ' .. join(out, ' ') | echohl None
-  endif
-  winrestview(view)
-enddef
-
-if executable('sqlfluff')
-  augroup sqlfluff_format
-    au!
-    autocmd BufWritePre * if &filetype ==# 'sql' | SqlFluffFormat() | endif
-    autocmd FileType sql setlocal formatprg=SqlFluffFormat()
-  augroup END
-endif
+for [k, v] in fixer_args->items()
+  g:['ale_' .. k] = v
+endfor
 
 def OnLspAttached()
   augroup lsp_cursor_diag
@@ -280,54 +264,20 @@ def OnLspAttached()
 
 enddef
 
+if executable('ansible-language-server')
+  augroup lsp_ansible_detect
+    au!
+    au BufRead,BufNewFile */playbooks/*.yml,*/playbooks/*.yaml setlocal filetype=yaml.ansible
+    au BufRead,BufNewFile */roles/*.yml,*/roles/*.yaml     setlocal filetype=yaml.ansible
+    au BufRead,BufNewFile */tasks/*.yml,*/tasks/*.yaml     setlocal filetype=yaml.ansible
+    au BufRead,BufNewFile */handlers/*.yml,*/handlers/*.yaml   setlocal filetype=yaml.ansible
+    au BufRead,BufNewFile *ansible*/*.yml,*ansible*/*.yaml   setlocal filetype=yaml.ansible
+  augroup END
+endif
+
 augroup lsp_attach
   au!
   autocmd User LspAttached call OnLspAttached()
-augroup END
-
-def HasPrettierRc(): bool
-  var dir = expand('%:p:h')
-  for name in [
-        \ '.prettierrc',
-        \ '.prettierrc.json', '.prettierrc.yaml', '.prettierrc.yml',
-        \ '.prettierrc.json5', '.prettierrc.toml',
-        \ '.prettierrc.js', '.prettierrc.cjs', '.prettierrc.mjs',
-        \ '.prettierrc.ts', '.prettierrc.cts', '.prettierrc.mts',
-        \ 'prettier.config.js', 'prettier.config.cjs', 'prettier.config.mjs',
-        \ 'prettier.config.ts', 'prettier.config.cts', 'prettier.config.mts']
-    if !empty(findfile(name, dir .. ';'))
-      return true
-    endif
-  endfor
-  return false
-enddef
-
-def PrettierYaml()
-  var view = winsaveview()
-  var src  = getline(1, '$')
-  var out  = systemlist('prettier --stdin-filepath ' .. shellescape(expand('%:p')), src)
-  if v:shell_error == 0 && !empty(out)
-    if out !=# src
-      call deletebufline('%', 1, '$')
-      call setline(1, out)
-    endif
-  else
-    echohl WarningMsg | echom 'prettier: ' .. join(out, ' ') | echohl None
-  endif
-  call winrestview(view)
-enddef
-
-def YamlFormatOnSave()
-  if executable('prettier') && HasPrettierRc()
-    call PrettierYaml()
-  else
-    silent! LspFormat
-  endif
-enddef
-
-augroup yaml_fmt
-  au!
-  autocmd BufWritePre *.yaml,*.yml call YamlFormatOnSave()
 augroup END
 
 def RegisterLspServers()
@@ -339,13 +289,13 @@ def RegisterLspServers()
     call add(servers, {'name': 'ty',   'filetype': ['python'], 'path': 'ty',   'args': ['server']})
   elseif executable('pylsp') && executable('ruff')
     var pylsp_cfg = {'pylsp': {'plugins': {
-      \ 'pycodestyle': {'enabled': v:false},
-      \ 'pyflakes':  {'enabled': v:false},
-      \ 'mccabe':    {'enabled': v:false},
-      \ 'yapf':    {'enabled': v:false},
-      \ 'autopep8':  {'enabled': v:false},
-      \ 'ruff':    {'enabled': v:true, 'formatEnabled': v:true},
-      \ }}}
+        'pycodestyle': {'enabled': v:false},
+        'pyflakes':  {'enabled': v:false},
+        'mccabe':    {'enabled': v:false},
+        'yapf':    {'enabled': v:false},
+        'autopep8':  {'enabled': v:false},
+        'ruff':    {'enabled': v:true, 'formatEnabled': v:true},
+    }}}
     call add(servers, {'name': 'pylsp', 'filetype': ['python'], 'path': 'pylsp', 'args': [], 'workspaceConfig': pylsp_cfg})
   elseif executable('ty')
     call add(servers, {'name': 'ty', 'filetype': ['python'], 'path': 'ty', 'args': ['server']})
@@ -353,11 +303,22 @@ def RegisterLspServers()
     call add(servers, {'name': 'ruff', 'filetype': ['python'], 'path': 'ruff', 'args': ['server']})
   elseif executable('pylsp')
     var pylsp_cfg = {'pylsp': {'plugins': {
-      \ 'pycodestyle': {'enabled': v:false},
-      \ 'pyflakes':  {'enabled': v:true},
-      \ 'yapf':    {'enabled': v:false},
-      \ }}}
+        'pycodestyle': {'enabled': v:false},
+        'pyflakes':  {'enabled': v:true},
+        'yapf':    {'enabled': v:false},
+    }}}
     call add(servers, {'name': 'pylsp', 'filetype': ['python'], 'path': 'pylsp', 'args': [], 'workspaceConfig': pylsp_cfg})
+  endif
+
+  if executable('julia')
+    call add(servers, {'name': 'julials', 'filetype': ['julia'], 'path': 'julia',
+        'args': [
+          '--startup-file=no',
+          '--history-file=no',
+          '-e',
+          'using LanguageServer, LanguageServer.SymbolServer; runserver()'
+        ]
+    })
   endif
 
   if executable('bash-language-server')
@@ -393,10 +354,11 @@ def RegisterLspServers()
 
   if executable('pwsh')
     var pses_paths = [
-      \ expand('~/.local/share/powershell/Modules/PowerShellEditorServices/Start-EditorServices.ps1'),
-      \ expand('~/Documents/PowerShell/Modules/PowerShellEditorServices/Start-EditorServices.ps1'),
-      \ expand('~/.local/share/powershell/Modules/PowerShellEditorServices/PowerShellEditorServices/Start-EditorServices.ps1'),
-      \ expand('~/Documents/PowerShell/Modules/PowerShellEditorServices/PowerShellEditorServices/Start-EditorServices.ps1')]
+        expand('~/.local/share/powershell/Modules/PowerShellEditorServices/Start-EditorServices.ps1'),
+        expand('~/Documents/PowerShell/Modules/PowerShellEditorServices/Start-EditorServices.ps1'),
+        expand('~/.local/share/powershell/Modules/PowerShellEditorServices/PowerShellEditorServices/Start-EditorServices.ps1'),
+        expand('~/Documents/PowerShell/Modules/PowerShellEditorServices/PowerShellEditorServices/Start-EditorServices.ps1')
+      ]
     var pses_found = null_string
     for p in pses_paths
       if filereadable(p)
@@ -420,7 +382,7 @@ def RegisterLspServers()
 
   if executable('yaml-language-server')
     var yaml_cfg = {'yaml': {'validate': v:true, 'completion': v:true, 'hover': v:true, 'yamlVersion': '1.2', 'schemaStore': {'enable': v:true}}}
-    call add(servers, {'name': 'yamlls', 'filetype': ['yaml', 'yml'], 'path': 'yaml-language-server', 'args': ['--stdio'], 'workspaceConfig': yaml_cfg})
+    call add(servers, {'name': 'yamlls', 'filetype': ['yaml'], 'path': 'yaml-language-server', 'args': ['--stdio'], 'workspaceConfig': yaml_cfg})
   endif
 
   if executable('sqls')
@@ -467,7 +429,7 @@ def RegisterLspServers()
   endif
 
   if executable('clangd')
-    call add(servers, {'name': 'clangd', 'filetype': ['c', 'cpp', 'objc', 'objcpp', 'cuda'], 'path': 'clangd', 'args': ['--background-index']})
+    call add(servers, {'name': 'clangd', 'filetype': ['c', 'cpp', 'objc', 'objcpp'], 'path': 'clangd', 'args': ['--background-index']})
   endif
 
   if executable('promql-langserver')
@@ -476,6 +438,47 @@ def RegisterLspServers()
 
   if !empty(servers)
     call g:LspAddServer(servers)
+  endif
+enddef
+
+def HasPrettierRc(): bool
+  var dir = expand('%:p:h')
+  for name in [
+    '.prettierrc',
+    '.prettierrc.json', '.prettierrc.yaml', '.prettierrc.yml',
+    '.prettierrc.json5', '.prettierrc.toml',
+    '.prettierrc.js', '.prettierrc.cjs', '.prettierrc.mjs',
+    '.prettierrc.ts', '.prettierrc.cts', '.prettierrc.mts',
+    'prettier.config.js', 'prettier.config.cjs', 'prettier.config.mjs',
+    'prettier.config.ts', 'prettier.config.cts', 'prettier.config.mts'
+  ]
+    if !empty(findfile(name, dir .. ';'))
+      return true
+    endif
+  endfor
+  return false
+enddef
+
+def PrettierYaml()
+  var view = winsaveview()
+  var src  = getline(1, '$')
+  var out  = systemlist('prettier --stdin-filepath ' .. shellescape(expand('%:p')), src)
+  if v:shell_error == 0 && !empty(out)
+    if out !=# src
+      call deletebufline('%', 1, '$')
+      call setline(1, out)
+    endif
+  else
+    echohl WarningMsg | echom 'prettier: ' .. join(out, ' ') | echohl None
+  endif
+  call winrestview(view)
+enddef
+
+def YamlFormat()
+  if executable('prettier') && HasPrettierRc()
+    call PrettierYaml()
+  else
+    silent! LspFormat
   endif
 enddef
 
@@ -501,30 +504,11 @@ augroup lsp_filetypes
   au BufRead,BufNewFile *.pkr.json setlocal filetype=json
 augroup END
 
-augroup hcl_fmt
+# YamlFormat has its own conditional logic, so always turn on these aus :)
+augroup yaml_fmt
   au!
-  if executable('packer')
-    autocmd FileType hcl setlocal formatprg=packer\ fmt\ -
-  endif
+  autocmd BufWritePre * if &filetype ==# 'yaml' | YamlFormat() | endif
 augroup END
-
-augroup dhall_fmt
-  au!
-  if executable('dhall')
-    autocmd FileType dhall setlocal formatprg=dhall\ format\ -
-  endif
-augroup END
-
-if executable('ansible-language-server')
-  augroup lsp_ansible_detect
-    au!
-    au BufRead,BufNewFile */playbooks/*.yml,*/playbooks/*.yaml setlocal filetype=yaml.ansible
-    au BufRead,BufNewFile */roles/*.yml,*/roles/*.yaml     setlocal filetype=yaml.ansible
-    au BufRead,BufNewFile */tasks/*.yml,*/tasks/*.yaml     setlocal filetype=yaml.ansible
-    au BufRead,BufNewFile */handlers/*.yml,*/handlers/*.yaml   setlocal filetype=yaml.ansible
-    au BufRead,BufNewFile *ansible*/*.yml,*ansible*/*.yaml   setlocal filetype=yaml.ansible
-  augroup END
-endif
 
 if executable('rg')
   set grepprg=rg\ --vimgrep\ --smart-case
@@ -538,27 +522,27 @@ nnoremap <silent> <leader>gl :call ToggleGitLens()<CR>
 g:gitgutter_sign_priority = 9
 
 g:op_surround_maps = [
-  \ {'map': 'sa(', 'open_delim': '(', 'close_delim': ')', 'action': 'append'},
-  \ {'map': 'sd(', 'open_delim': '(', 'close_delim': ')', 'action': 'delete'},
-  \ {'map': 'sa[', 'open_delim': '[', 'close_delim': ']', 'action': 'append'},
-  \ {'map': 'sd[', 'open_delim': '[', 'close_delim': ']', 'action': 'delete'},
-  \ {'map': 'sa{', 'open_delim': '{', 'close_delim': '}', 'action': 'append'},
-  \ {'map': 'sd{', 'open_delim': '{', 'close_delim': '}', 'action': 'delete'},
-  \ {'map': 'sa"', 'open_delim': '"', 'close_delim': '"', 'action': 'append'},
-  \ {'map': 'sd"', 'open_delim': '"', 'close_delim': '"', 'action': 'delete'},
-  \ {'map': "sa'", 'open_delim': "'", 'close_delim': "'", 'action': 'append'},
-  \ {'map': "sd'", 'open_delim': "'", 'close_delim': "'", 'action': 'delete'},
-  \ {'map': 'sa`', 'open_delim': '`', 'close_delim': '`', 'action': 'append'},
-  \ {'map': 'sd`', 'open_delim': '`', 'close_delim': '`', 'action': 'delete'},
-  \ ]
+    {'map': 'sa(', 'open_delim': '(', 'close_delim': ')', 'action': 'append'},
+    {'map': 'sd(', 'open_delim': '(', 'close_delim': ')', 'action': 'delete'},
+    {'map': 'sa[', 'open_delim': '[', 'close_delim': ']', 'action': 'append'},
+    {'map': 'sd[', 'open_delim': '[', 'close_delim': ']', 'action': 'delete'},
+    {'map': 'sa{', 'open_delim': '{', 'close_delim': '}', 'action': 'append'},
+    {'map': 'sd{', 'open_delim': '{', 'close_delim': '}', 'action': 'delete'},
+    {'map': 'sa"', 'open_delim': '"', 'close_delim': '"', 'action': 'append'},
+    {'map': 'sd"', 'open_delim': '"', 'close_delim': '"', 'action': 'delete'},
+    {'map': "sa'", 'open_delim': "'", 'close_delim': "'", 'action': 'append'},
+    {'map': "sd'", 'open_delim': "'", 'close_delim': "'", 'action': 'delete'},
+    {'map': 'sa`', 'open_delim': '`', 'close_delim': '`', 'action': 'append'},
+    {'map': 'sd`', 'open_delim': '`', 'close_delim': '`', 'action': 'delete'},
+  ]
 
 nnoremap <silent> <leader>u :UndotreeToggle<CR>
 
 xnoremap <silent> <leader>r :ReplicaSendLines<CR>
 
-inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
-inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-inoremap <expr> <CR>  pumvisible() ? "\<C-y>" : "\<CR>"
+inoremap <expr> <Tab>   pumvisible() ? "<C-n>" : "<Tab>"
+inoremap <expr> <S-Tab> pumvisible() ? "<C-p>" : "<S-Tab>"
+inoremap <expr> <CR>  pumvisible() ? "<C-y>" : "<CR>"
 
 g:vimwiki_list = [{'path': '~/wiki/', 'syntax': 'markdown', 'ext': '.md'}]
 g:vimwiki_autowriteall = 0
