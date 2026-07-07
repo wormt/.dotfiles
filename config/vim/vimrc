@@ -86,6 +86,7 @@ def PackInit()
   #lsp/linting/formatting
   call minpac#add('yegappan/lsp')
   call minpac#add('dense-analysis/ale')
+  call minpac#add('nickel-lang/vim-nickel')
 
   #git stuff this shit runs git like every second
   call minpac#add('airblade/vim-gitgutter')
@@ -214,6 +215,7 @@ g:ale_fixers = {
     'bash':       ['shfmt'],
     'terraform':  ['terraform'],
     'hcl':        ['packer-fmt', 'terraform-fmt'],
+    'nickel':      ['nickel_format'],
     'dhall':      ['dhall-format'],
     'jinja':      ['j2lint'],
     'typescript': ['prettier'],
@@ -346,6 +348,10 @@ def RegisterLspServers()
 
   if executable('jsonnet-language-server')
     call add(servers, {'name': 'jsonnet', 'filetype': ['jsonnet', 'libsonnet'], 'path': 'jsonnet-language-server', 'args': []})
+  endif
+
+  if executable('nls')
+    call add(servers, {'name': 'nls', 'filetype': ['nickel'], 'path': 'nls', 'args': []})
   endif
 
   if executable('dhall-lsp-server')
