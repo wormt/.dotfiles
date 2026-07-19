@@ -1,5 +1,25 @@
 #!/usr/bin/env nu
 
+# for nickel:
+cd nickel
+let nickel_src = "policy.ncl"
+let nickel_output = "~/.config/containers/policy.json"
+mkdir ($nickel_output | path expand | path dirname)
+
+let host_ncl = if ("host.ncl" | path exists) {
+  cat host.ncl
+} else {
+  "{}"
+}
+
+(
+  nickel export $nickel_src -- "inputs.keys_dir=\"/usr/etc/pki\""
+  --override $"inputs.host_insecure = ($host_ncl)"
+  | save -f ($nickel_output | path expand)
+)
+print $"nickel policy.json -> ($nickel_output)"
+
+# for dhall:
 # host.yaml format is a list of dicts with the following schema:
 # ---
 # halloy:
@@ -12,8 +32,7 @@
 #   outputs:
 #     config: "~/.config/ghostty/config"
 
-
-cd dhall
+cd ../dhall
 let data = (cat config.dhall | dhall-to-json | from json)
 
 # this for loop sucks.
@@ -25,7 +44,7 @@ for app in (open host.yaml | transpose key value) {
         let record = $data | get $app.key | get $out.subkey
 
         if $format == "raw_transient" {
-          $record | dconf load /
+          $record 
           print $"($app.key) loaded."
           break
         }
