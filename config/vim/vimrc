@@ -258,6 +258,28 @@ def OnLspAttached()
   nnoremap <buffer> <silent> <leader>ws <Cmd>LspSymbolSearch<CR>
   nnoremap <buffer> <silent> <leader>pe <Cmd>LspPeekDefinition<CR>
 
+  # code actions & imports
+  nnoremap <buffer> <silent> <leader>co <Cmd>LspOrganizeImports<CR>
+  nnoremap <buffer> <silent> <leader>fx <Cmd>LspFixAll<CR>
+
+  # diagnostics
+  nnoremap <buffer> <silent> <leader>dc <Cmd>LspDiagCurrent<CR>
+  nnoremap <buffer> <silent> <leader>dh <Cmd>LspDiag here<CR>
+
+  # signature help
+  nnoremap <buffer> <silent> <leader>ss <Cmd>LspShowSignature<CR>
+
+  # references / highlighting
+  nnoremap <buffer> <silent> <leader>hl <Cmd>LspHighlight<CR>
+  nnoremap <buffer> <silent> <leader>hc <Cmd>LspHighlightClear<CR>
+
+  # call hierarchy
+  nnoremap <buffer> <silent> <leader>ci <Cmd>LspIncomingCalls<CR>
+  nnoremap <buffer> <silent> <leader>cg <Cmd>LspOutgoingCalls<CR>
+
+  # outline
+  nnoremap <buffer> <silent> <leader>ol <Cmd>LspOutline<CR>
+
   nnoremap <buffer> ]q :cnext<CR>
   nnoremap <buffer> [q :cprev<CR>
   nnoremap <buffer> ]Q :clast<CR>
@@ -403,7 +425,43 @@ def RegisterLspServers()
   endif
 
   if executable('rust-analyzer')
-    call add(servers, {'name': 'rust-analyzer', 'filetype': ['rust'], 'path': 'rust-analyzer', 'args': [], 'syncInit': v:true})
+    var ra_init_opts = {
+        'cargo': {
+          'buildScripts': {'enable': v:true},
+          'loadOutDirsFromCheck': v:true,
+          'checkOnSave': v:true,
+        },
+      }
+    var ra_workspace_cfg = {
+        'rust-analyzer': {
+          'cargo': {
+            'autoImport': {'enable': v:true},
+            'buildScripts': {'enable': v:true},
+            'loadOutDirsFromCheck': v:true,
+          },
+          'procMacro': {'enable': v:true},
+          'check': {
+            'enable': v:true,
+            'command': 'check',
+            'allTargets': v:true,
+          },
+          'completion': {
+            'addCallParenthesis': v:true,
+            'addCallArgumentSnippets': v:true,
+            'autoimport': {'enable': v:true},
+          },
+        },
+      }
+    call add(servers, {
+        'name': 'rust-analyzer',
+        'filetype': ['rust'],
+        'path': 'rust-analyzer',
+        'args': [],
+        'syncInit': v:true,
+        'rootSearch': ['Cargo.toml'],
+        'initializationOptions': ra_init_opts,
+        'workspaceConfig': ra_workspace_cfg,
+      })
   endif
 
   if executable('typescript-language-server')
