@@ -144,6 +144,14 @@ silent! packadd ayu-vim
 g:ayucolor = "dark"
 colorscheme ayu
 
+var inlay_hints_on = true
+def ToggleInlayHints()
+  inlay_hints_on = !inlay_hints_on
+  call g:LspOptionsSet({'showInlayHints': inlay_hints_on ? v:true : v:false})
+  echo 'inlay hints: ' .. (inlay_hints_on ? 'on' : 'off')
+enddef
+nnoremap <silent> <leader>ti <ScriptCmd>ToggleInlayHints()<CR>
+
 augroup lsp_options
   au!
   autocmd User LspSetup call g:LspOptionsSet({
@@ -185,6 +193,9 @@ highlight LspReference    guibg=#253340 guifg=NONE
 highlight LspReferenceText  guibg=#253340 guifg=NONE
 highlight LspReferenceRead  guibg=#253340 guifg=NONE
 highlight LspReferenceWrite guibg=#2E3A2A guifg=NONE
+# inlay hints
+highlight LspInlayHintsType  guifg=#5C6773 guibg=NONE gui=italic
+highlight LspInlayHintsParam guifg=#4D5566 guibg=NONE gui=italic
 
 highlight Status1     guibg=#FFB454 guifg=#0F1419 gui=bold
 highlight Status2     guibg=#253340 guifg=#E6E1CF gui=NONE
@@ -211,6 +222,7 @@ g:ale_fixers = {
     'cpp':        ['clang-format'],
     'cmake':      ['cmake-format'],
     'gleam':      ['gleam_format'],
+    'haskell':    ['fourmolu'],
     'python':     ['ruff', 'ruff_format'],
     'sh':         ['shfmt'],
     'bash':       ['shfmt'],
@@ -443,14 +455,38 @@ def RegisterLspServers()
           'procMacro': {'enable': v:true},
           'check': {
             'enable': v:true,
-            'command': 'check',
+            'command': 'clippy',
             'allTargets': v:true,
+            'extraArgs': ['--', '-W', 'clippy::pedantic', '-A', 'clippy::missing_docs_in_private_items'],
           },
           'completion': {
             'addCallParenthesis': v:true,
             'addCallArgumentSnippets': v:true,
             'autoimport': {'enable': v:true},
           },
+          'inlayHints': {
+            'bindingModeHints': {'enable': v:true},
+            'chainingHints': {'enable': v:true},
+            'closingBraceHints': {'enable': v:true, 'minLines': 20},
+            'closureCaptureHints': {'enable': v:true},
+            'closureReturnTypeHints': {'enable': 'always'},
+            'discriminantHints': {'enable': 'fieldless'},
+            'expressionAdjustmentHints': {'enable': 'reborrow', 'mode': 'prefix', 'hideOutsideUnsafe': v:false},
+            'genericParameterHints': {'lifetime': {'enable': v:true}, 'const': {'enable': v:true}, 'type': {'enable': v:false}},
+            'implicitDrops': {'enable': v:true},
+            'lifetimeElisionHints': {'enable': 'always', 'useParameterNames': v:true},
+            'parameterHints': {'enable': v:true},
+            'rangeExclusiveHints': {'enable': v:true},
+            'reborrowHints': {'enable': 'mutable'},
+            'typeHints': {'enable': v:true, 'hideClosureInitialization': v:false, 'hideNamedConstructor': v:false},
+          },
+          'hover': {
+            'memoryLayout': {'enable': v:true, 'size': 'both', 'alignment': 'both', 'offset': 'both', 'niches': v:true},
+            'documentation': {'enable': v:true, 'keywords': v:true},
+            'show': {'traitAssocItems': 5, 'fields': 10, 'enumVariants': 10},
+            'links': {'enable': v:true},
+          },
+          'lens': {'enable': v:false},
         },
       }
     call add(servers, {
@@ -474,7 +510,61 @@ def RegisterLspServers()
   endif
 
   if executable('zls')
-    call add(servers, {'name': 'zls', 'filetype': ['zig'], 'path': 'zls', 'args': []})
+    var zls_cfg = {
+        'enable_snippets': v:true,
+        'enable_argument_placeholders': v:true,
+        'enable_build_on_save': v:true,
+        'semantic_tokens': 'full',
+        'warn_style': v:true,
+        'highlight_global_var_declarations': v:true,
+        'inlay_hints_show_variable_type_hints': v:true,
+        'inlay_hints_show_parameter_name': v:true,
+        'inlay_hints_show_builtin': v:true,
+        'inlay_hints_exclude_single_argument': v:false,
+        'inlay_hints_hide_redundant_param_names': v:false,
+        'inlay_hints_hide_redundant_param_names_last_token': v:false,
+      }
+    call add(servers, {
+        'name': 'zls',
+        'filetype': ['zig'],
+        'path': 'zls',
+        'args': [],
+        'rootSearch': ['build.zig', 'build.zig.zon'],
+        'initializationOptions': zls_cfg,
+        'workspaceConfig': {'zls': zls_cfg},
+      })
+  endif
+
+  if executable('haskell-language-server-wrapper') || executable('haskell-language-server')
+    var hls_path = executable('haskell-language-server-wrapper') == 1
+      ? 'haskell-language-server-wrapper'
+      : 'haskell-language-server'
+    var hls_cfg = {
+        'haskell': {
+          'formattingProvider': executable('fourmolu') == 1 ? 'fourmolu' : 'ormolu',
+          'checkProject': v:true,
+          'maxCompletions': 40,
+          'plugin': {
+            'ghcide-type-lenses': {'globalOn': v:true, 'config': {'mode': 'always'}},
+            'eval': {'globalOn': v:true},
+            'hlint': {'globalOn': v:true},
+            'importLens': {'globalOn': v:true},
+            'class': {'globalOn': v:true},
+            'refineImports': {'globalOn': v:true},
+            'semanticTokens': {'globalOn': v:true},
+          },
+        },
+      }
+    call add(servers, {
+        'name': 'hls',
+        'filetype': ['haskell', 'lhaskell'],
+        'path': hls_path,
+        'args': ['--lsp'],
+        'syncInit': v:true,
+        'rootSearch': ['hie.yaml', 'cabal.project', 'stack.yaml', 'package.yaml'],
+        'initializationOptions': hls_cfg,
+        'workspaceConfig': hls_cfg,
+      })
   endif
 
   if executable('vscode-json-language-server')
