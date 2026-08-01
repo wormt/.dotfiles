@@ -228,7 +228,7 @@ g:ale_fixers = {
     'bash':       ['shfmt'],
     'terraform':  ['terraform'],
     'hcl':        ['packer-fmt', 'terraform-fmt'],
-    'nickel':      ['nickel_format'],
+    'nickel':     ['nickel_format'],
     'dhall':      ['dhall-format'],
     'jinja':      ['j2lint'],
     'typescript': ['prettier'],
