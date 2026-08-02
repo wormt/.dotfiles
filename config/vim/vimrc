@@ -149,6 +149,11 @@ silent! packadd ayu-vim
 #ayu
 g:ayucolor = "dark"
 colorscheme ayu
+highlight netrwTreeBar  guifg=#F07178
+highlight netrwDir      guifg=#59C2FF gui=bold
+highlight netrwExe      guifg=#FFB454
+highlight netrwSymLink  guifg=#95E6CB
+highlight netrwClassify guifg=#5C6773
 
 var inlay_hints_on = true
 def ToggleInlayHints()
