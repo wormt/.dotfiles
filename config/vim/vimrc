@@ -723,6 +723,7 @@ g:op_surround_maps = [
   ]
 
 nnoremap <silent> <leader>u :UndotreeToggle<CR>
+nnoremap <silent> <leader>e <Cmd>Lexplore<CR>
 
 xnoremap <silent> <leader>r :ReplicaSendLines<CR>
 
