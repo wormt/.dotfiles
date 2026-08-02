@@ -433,7 +433,32 @@ def RegisterLspServers()
   endif
 
   if executable('gopls')
-    var gopls_cfg = {'gopls': {'staticcheck': v:true, 'usePlaceholders': v:true, 'completeUnimported': v:true}}
+    var gopls_cfg = {
+        'gopls': {
+          'usePlaceholders': v:true,
+          'completeUnimported': v:true,
+          'staticcheck': v:true,
+          'gofumpt': v:true,
+          'analyses': {
+            'shadow': v:true,
+            'nilness': v:true,
+            'unusedparams': v:true,
+            'unusedwrite': v:true,
+            'useany': v:true,
+            'fieldalignment': v:true,
+          },
+          'hints': {
+            'assignVariableType': v:true,
+            'compositeLiteralFields': v:true,
+            'compositeLiteralTypes': v:true,
+            'constantValues': v:true,
+            'functionTypeParameters': v:true,
+            'parameterNames': v:true,
+            'rangeVariableTypes': v:true,
+          },
+          'semanticTokens': v:true,
+        }
+      }
     call add(servers, {'name': 'gopls', 'filetype': ['go', 'gomod', 'gowork', 'gohtmltmpl', 'gotexttmpl'], 'path': 'gopls', 'args': ['-remote=auto'], 'syncInit': v:true, 'workspaceConfig': gopls_cfg})
   endif
 
