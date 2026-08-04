@@ -359,11 +359,23 @@ def RegisterLspServers()
         'rootSearch': ['pyproject.toml', 'ty.toml', '.venv', 'requirements.txt', 'setup.py', 'setup.cfg', 'poetry.lock'],
       })
   elseif executable('pylsp')
-    var pylsp_cfg = {'pylsp': {'plugins': {
-        'pycodestyle': {'enabled': v:false},
-        'pyflakes':  {'enabled': v:true},
-        'yapf':    {'enabled': v:false},
-    }}}
+    var pylsp_cfg = {}
+    if executable('ruff')
+      pylsp_cfg = {'pylsp': {'plugins': {
+          'pycodestyle': {'enabled': v:false},
+          'pyflakes':  {'enabled': v:false},
+          'mccabe':    {'enabled': v:false},
+          'yapf':    {'enabled': v:false},
+          'autopep8':  {'enabled': v:false},
+          'ruff':    {'enabled': v:true, 'formatEnabled': v:true},
+      }}}
+    else
+      pylsp_cfg = {'pylsp': {'plugins': {
+          'pycodestyle': {'enabled': v:false},
+          'pyflakes':  {'enabled': v:true},
+          'yapf':    {'enabled': v:false},
+      }}}
+    endif
     call add(servers, {'name': 'pylsp', 'filetype': ['python'], 'path': 'pylsp', 'args': [], 'workspaceConfig': pylsp_cfg})
   elseif executable('basedpyright')
     call add(servers, {
