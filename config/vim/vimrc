@@ -332,23 +332,32 @@ def RegisterLspServers()
   # append to this and we will declare everything at the end once
   var servers = []
 
-  if executable('ty') && executable('ruff')
-    call add(servers, {'name': 'ruff', 'filetype': ['python'], 'path': 'ruff', 'args': ['server']})
-    call add(servers, {'name': 'ty',   'filetype': ['python'], 'path': 'ty',   'args': ['server']})
-  elseif executable('pylsp') && executable('ruff')
-    var pylsp_cfg = {'pylsp': {'plugins': {
-        'pycodestyle': {'enabled': v:false},
-        'pyflakes':  {'enabled': v:false},
-        'mccabe':    {'enabled': v:false},
-        'yapf':    {'enabled': v:false},
-        'autopep8':  {'enabled': v:false},
-        'ruff':    {'enabled': v:true, 'formatEnabled': v:true},
-    }}}
-    call add(servers, {'name': 'pylsp', 'filetype': ['python'], 'path': 'pylsp', 'args': [], 'workspaceConfig': pylsp_cfg})
-  elseif executable('ty')
-    call add(servers, {'name': 'ty', 'filetype': ['python'], 'path': 'ty', 'args': ['server']})
-  elseif executable('ruff')
-    call add(servers, {'name': 'ruff', 'filetype': ['python'], 'path': 'ruff', 'args': ['server']})
+  if executable('ty')
+    var ty_workspace_config = {
+          'ty': {
+            'inlayHints': {
+              'variableTypes': v:true,
+              'callArgumentNames': v:true,
+            },
+            'completions': {
+              'autoImport': v:true,
+              'completeFunctionParentheses': v:false,
+            },
+            'diagnosticMode': 'workspace',
+          },
+        }
+    call add(servers, {
+        'name': 'ty',
+        'filetype': ['python'],
+        'path': 'ty',
+        'args': ['server'],
+        'initializationOptions': {
+          'logLevel': 'warn',
+          'logFile': expand('~/.cache/vim/ty.log'),
+        },
+        'workspaceConfig': ty_workspace_config,
+        'rootSearch': ['pyproject.toml', 'ty.toml', '.venv', 'requirements.txt', 'setup.py', 'setup.cfg', 'poetry.lock'],
+      })
   elseif executable('pylsp')
     var pylsp_cfg = {'pylsp': {'plugins': {
         'pycodestyle': {'enabled': v:false},
@@ -356,6 +365,22 @@ def RegisterLspServers()
         'yapf':    {'enabled': v:false},
     }}}
     call add(servers, {'name': 'pylsp', 'filetype': ['python'], 'path': 'pylsp', 'args': [], 'workspaceConfig': pylsp_cfg})
+  elseif executable('basedpyright')
+    call add(servers, {
+        'name': 'basedpyright',
+        'filetype': ['python'],
+        'path': 'basedpyright-langserver',
+        'args': ['--stdio'],
+        'rootSearch': ['pyproject.toml', '.venv', 'requirements.txt', 'setup.py', 'setup.cfg', 'poetry.lock'],
+      })
+  elseif executable('pyright')
+    call add(servers, {
+        'name': 'pyright',
+        'filetype': ['python'],
+        'path': 'pyright-langserver',
+        'args': ['--stdio'],
+        'rootSearch': ['pyproject.toml', '.venv', 'requirements.txt', 'setup.py', 'setup.cfg', 'poetry.lock'],
+      })
   endif
 
   if executable('julia')
