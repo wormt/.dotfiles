@@ -281,6 +281,7 @@ def OnLspAttached()
   nnoremap <buffer> <silent> <leader>ds <Cmd>LspDocumentSymbol<CR>
   nnoremap <buffer> <silent> <leader>ws <Cmd>LspSymbolSearch<CR>
   nnoremap <buffer> <silent> <leader>pe <Cmd>LspPeekDefinition<CR>
+  nnoremap <buffer> <silent> <leader>sh <Cmd>LspSwitchSourceHeader<CR>
 
   # code actions & imports
   nnoremap <buffer> <silent> <leader>co <Cmd>LspOrganizeImports<CR>
@@ -657,7 +658,21 @@ def RegisterLspServers()
   endif
 
   if executable('clangd')
-    call add(servers, {'name': 'clangd', 'filetype': ['c', 'cpp', 'objc', 'objcpp'], 'path': 'clangd', 'args': ['--background-index']})
+    call add(servers, {
+        'name': 'clangd',
+        'filetype': ['c', 'cpp', 'objc', 'objcpp'],
+        'path': 'clangd',
+        'args': [
+          '--completion-style=detailed',
+          '--background-index-priority=normal',
+          '--limit-references=0',
+          '--rename-file-limit=0',
+          '--pch-storage=memory',
+          '--query-driver=/usr/bin/*,/usr/local/bin/*',
+        ],
+        'syncInit': v:true,
+        'rootSearch': ['compile_commands.json', 'compile_flags.txt', '.clangd'],
+      })
   endif
 
   if executable('promql-langserver')
