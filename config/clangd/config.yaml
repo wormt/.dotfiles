@@ -1,0 +1,21 @@
+InlayHints:
+  BlockEnd: Yes
+  DefaultArguments: Yes
+
+Diagnostics:
+  UnusedIncludes: Strict
+  MissingIncludes: Strict
+  ClangTidy:
+    FastCheckFilter: None
+    Add:
+      - bugprone-*
+      - cert-*
+      - concurrency-*
+      - cppcoreguidelines-*
+      - misc-*
+      - modernize-*
+      - performance-*
+      - portability-*
+      - readability-*
+    Remove:
+      - modernize-use-trailing-return-type
