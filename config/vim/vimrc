@@ -685,7 +685,12 @@ def RegisterLspServers()
         },
       }
     var jdtls_args: list<string> = []
-    var lombok_jar = expand('~/.local/share/java/lombok.jar')
+    var lombok_jar: string = ''
+    if exists($LOMBOK_PATH)
+      lombok_jar = $LOMBOK_PATH
+    else
+      lombok_jar = expand('~/.local/share/java/lombok.jar')
+    endif
     if filereadable(lombok_jar)
       jdtls_args = ['--jvm-arg=-javaagent:' .. lombok_jar]
     endif
