@@ -235,6 +235,7 @@ g:ale_fixers = {
     'gleam':      ['gleam_format'],
     'haskell':    ['fourmolu'],
     'python':     ['ruff', 'ruff_format'],
+    'java':       ['google_java_format'],
     'sh':         ['shfmt'],
     'bash':       ['shfmt'],
     'terraform':  ['terraform'],
@@ -638,6 +639,65 @@ def RegisterLspServers()
         'rootSearch': ['hie.yaml', 'cabal.project', 'stack.yaml', 'package.yaml'],
         'initializationOptions': hls_cfg,
         'workspaceConfig': hls_cfg,
+      })
+  endif
+
+  if executable('jdtls')
+    var jdtls_settings = {
+        'java': {
+          'signatureHelp': {'enabled': v:true, 'description': {'enabled': v:true}},
+          'inlayHints': {
+            'parameterNames': {'enabled': 'all'},
+            'variableTypes': {'enabled': v:true},
+            'parameterTypes': {'enabled': v:true},
+            'formatParameters': {'enabled': v:true},
+          },
+          'implementationCodeLens': 'all',
+          'completion': {
+            'chain': {'enabled': v:true},
+            'maxResults': 0,
+          },
+          'maven': {'downloadSources': v:true},
+          'eclipse': {'downloadSources': v:true},
+          'compile': {
+            'nullAnalysis': {
+              'mode': 'automatic',
+              'nonnull': [
+                'org.jspecify.annotations.NonNull',
+                'org.eclipse.jdt.annotation.NonNull',
+                'javax.annotation.Nonnull',
+                'jakarta.annotation.Nonnull',
+                'org.jetbrains.annotations.NotNull',
+              ],
+              'nullable': [
+                'org.jspecify.annotations.Nullable',
+                'org.eclipse.jdt.annotation.Nullable',
+                'javax.annotation.Nullable',
+                'jakarta.annotation.Nullable',
+                'org.jetbrains.annotations.Nullable',
+              ],
+              'nonnullbydefault': [
+                'org.jspecify.annotations.NullMarked',
+                'org.eclipse.jdt.annotation.NonNullByDefault',
+              ],
+            },
+          },
+        },
+      }
+    var jdtls_args: list<string> = []
+    var lombok_jar = expand('~/.local/share/java/lombok.jar')
+    if filereadable(lombok_jar)
+      jdtls_args = ['--jvm-arg=-javaagent:' .. lombok_jar]
+    endif
+    call add(servers, {
+        'name': 'jdtls',
+        'filetype': ['java'],
+        'path': 'jdtls',
+        'args': jdtls_args,
+        'syncInit': v:true,
+        'rootSearch': ['pom.xml', 'mvnw', 'build.gradle', 'build.gradle.kts', 'settings.gradle', 'settings.gradle.kts', 'gradlew'],
+        'initializationOptions': {'settings': jdtls_settings},
+        'workspaceConfig': jdtls_settings,
       })
   endif
 
