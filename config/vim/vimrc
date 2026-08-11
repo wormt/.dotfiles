@@ -65,7 +65,7 @@ if has('clipboard_provider') && executable('wl-copy')
   enddef
 
   def WlClipPaste(reg: string): list<any>
-    var lines = systemlist('wl-paste --no-newline')
+    var lines: list<string> = systemlist('wl-paste --no-newline')
     if v:shell_error != 0
       return []   # invalid return = register left unchanged, per the docs
     endif
@@ -155,7 +155,7 @@ highlight netrwExe      guifg=#FFB454
 highlight netrwSymLink  guifg=#95E6CB
 highlight netrwClassify guifg=#5C6773
 
-var inlay_hints_on = true
+var inlay_hints_on: bool = true
 def ToggleInlayHints()
   inlay_hints_on = !inlay_hints_on
   call g:LspOptionsSet({'showInlayHints': inlay_hints_on ? v:true : v:false})
@@ -235,6 +235,7 @@ g:ale_fixers = {
     'gleam':      ['gleam_format'],
     'haskell':    ['fourmolu'],
     'python':     ['ruff', 'ruff_format'],
+    'java':       ['google_java_format'],
     'sh':         ['shfmt'],
     'bash':       ['shfmt'],
     'terraform':  ['terraform'],
@@ -251,7 +252,7 @@ g:ale_fixers = {
     'sql':        ['sqlfluff'],
 }
 
-var fixer_args = {
+var fixer_args: dict<string> = {
     'rust_rustfmt_options': '--edition 2024 --style-edition 2024',
     'sql_sqlfluff_options': '--dialect ansi',
 }
@@ -281,6 +282,7 @@ def OnLspAttached()
   nnoremap <buffer> <silent> <leader>ds <Cmd>LspDocumentSymbol<CR>
   nnoremap <buffer> <silent> <leader>ws <Cmd>LspSymbolSearch<CR>
   nnoremap <buffer> <silent> <leader>pe <Cmd>LspPeekDefinition<CR>
+  nnoremap <buffer> <silent> <leader>sh <Cmd>LspSwitchSourceHeader<CR>
 
   # code actions & imports
   nnoremap <buffer> <silent> <leader>co <Cmd>LspOrganizeImports<CR>
@@ -330,10 +332,10 @@ augroup END
 
 def RegisterLspServers()
   # append to this and we will declare everything at the end once
-  var servers = []
+  var servers: list<dict<any>> = []
 
   if executable('ty')
-    var ty_workspace_config = {
+    var ty_workspace_config: dict<any> = {
           'ty': {
             'inlayHints': {
               'variableTypes': v:true,
@@ -359,7 +361,7 @@ def RegisterLspServers()
         'rootSearch': ['pyproject.toml', 'ty.toml', '.venv', 'requirements.txt', 'setup.py', 'setup.cfg', 'poetry.lock'],
       })
   elseif executable('pylsp')
-    var pylsp_cfg = {}
+    var pylsp_cfg: dict<any> = {}
     if executable('ruff')
       pylsp_cfg = {'pylsp': {'plugins': {
           'pycodestyle': {'enabled': v:false},
@@ -415,7 +417,7 @@ def RegisterLspServers()
   endif
 
   if executable('ansible-language-server')
-    var ansible_opts = {'ansible': {'validation': {'lint': {'enabled': v:true}}}}
+    var ansible_opts: dict<any> = {'ansible': {'validation': {'lint': {'enabled': v:true}}}}
     call add(servers, {'name': 'ansiblels', 'filetype': ['yaml.ansible'], 'path': 'ansible-language-server', 'args': ['--stdio'], 'initializationOptions': ansible_opts})
   endif
 
@@ -442,21 +444,21 @@ def RegisterLspServers()
   endif
 
   if executable('pwsh')
-    var pses_paths = [
+    var pses_paths: list<string> = [
         expand('~/.local/share/powershell/Modules/PowerShellEditorServices/Start-EditorServices.ps1'),
         expand('~/Documents/PowerShell/Modules/PowerShellEditorServices/Start-EditorServices.ps1'),
         expand('~/.local/share/powershell/Modules/PowerShellEditorServices/PowerShellEditorServices/Start-EditorServices.ps1'),
         expand('~/Documents/PowerShell/Modules/PowerShellEditorServices/PowerShellEditorServices/Start-EditorServices.ps1')
       ]
-    var pses_found = null_string
+    var pses_found: string = null_string
     for p in pses_paths
       if filereadable(p)
         pses_found = p
         break
       endif
     endfor
-    if pses_found != ''
-      var pses_bundle = fnamemodify(pses_found, ':h')
+    if pses_found != null_string
+      var pses_bundle: string = fnamemodify(pses_found, ':h')
       add(servers, {
         name: 'powershell-es',
         filetype: ['ps1', 'powershell'],
@@ -470,7 +472,7 @@ def RegisterLspServers()
   endif
 
   if executable('yaml-language-server')
-    var yaml_cfg = {'yaml': {'validate': v:true, 'completion': v:true, 'hover': v:true, 'yamlVersion': '1.2', 'schemaStore': {'enable': v:true}}}
+    var yaml_cfg: dict<any> = {'yaml': {'validate': v:true, 'completion': v:true, 'hover': v:true, 'yamlVersion': '1.2', 'schemaStore': {'enable': v:true}}}
     call add(servers, {'name': 'yamlls', 'filetype': ['yaml'], 'path': 'yaml-language-server', 'args': ['--stdio'], 'workspaceConfig': yaml_cfg})
   endif
 
@@ -481,7 +483,7 @@ def RegisterLspServers()
   endif
 
   if executable('gopls')
-    var gopls_cfg = {
+    var gopls_cfg: dict<any> = {
         'gopls': {
           'usePlaceholders': v:true,
           'completeUnimported': v:true,
@@ -511,14 +513,14 @@ def RegisterLspServers()
   endif
 
   if executable('rust-analyzer')
-    var ra_init_opts = {
+    var ra_init_opts: dict<any> = {
         'cargo': {
           'buildScripts': {'enable': v:true},
           'loadOutDirsFromCheck': v:true,
           'checkOnSave': v:true,
         },
       }
-    var ra_workspace_cfg = {
+    var ra_workspace_cfg: dict<any> = {
         'rust-analyzer': {
           'cargo': {
             'autoImport': {'enable': v:true},
@@ -583,7 +585,7 @@ def RegisterLspServers()
   endif
 
   if executable('zls')
-    var zls_cfg = {
+    var zls_cfg: dict<any> = {
         'enable_snippets': v:true,
         'enable_argument_placeholders': v:true,
         'enable_build_on_save': v:true,
@@ -609,10 +611,10 @@ def RegisterLspServers()
   endif
 
   if executable('haskell-language-server-wrapper') || executable('haskell-language-server')
-    var hls_path = executable('haskell-language-server-wrapper') == 1
+    var hls_path: string = executable('haskell-language-server-wrapper') == 1
       ? 'haskell-language-server-wrapper'
       : 'haskell-language-server'
-    var hls_cfg = {
+    var hls_cfg: dict<any> = {
         'haskell': {
           'formattingProvider': executable('fourmolu') == 1 ? 'fourmolu' : 'ormolu',
           'checkProject': v:true,
@@ -640,6 +642,71 @@ def RegisterLspServers()
       })
   endif
 
+  if executable('jdtls')
+    var jdtls_settings: dict<any> = {
+        'java': {
+          'signatureHelp': {'enabled': v:true, 'description': {'enabled': v:true}},
+          'inlayHints': {
+            'parameterNames': {'enabled': 'all'},
+            'variableTypes': {'enabled': v:true},
+            'parameterTypes': {'enabled': v:true},
+            'formatParameters': {'enabled': v:true},
+          },
+          'implementationCodeLens': 'all',
+          'completion': {
+            'chain': {'enabled': v:true},
+            'maxResults': 0,
+          },
+          'maven': {'downloadSources': v:true},
+          'eclipse': {'downloadSources': v:true},
+          'compile': {
+            'nullAnalysis': {
+              'mode': 'automatic',
+              'nonnull': [
+                'org.jspecify.annotations.NonNull',
+                'org.eclipse.jdt.annotation.NonNull',
+                'javax.annotation.Nonnull',
+                'jakarta.annotation.Nonnull',
+                'org.jetbrains.annotations.NotNull',
+              ],
+              'nullable': [
+                'org.jspecify.annotations.Nullable',
+                'org.eclipse.jdt.annotation.Nullable',
+                'javax.annotation.Nullable',
+                'jakarta.annotation.Nullable',
+                'org.jetbrains.annotations.Nullable',
+              ],
+              'nonnullbydefault': [
+                'org.jspecify.annotations.NullMarked',
+                'org.eclipse.jdt.annotation.NonNullByDefault',
+              ],
+            },
+          },
+        },
+      }
+    var jdtls_args: list<string> = []
+    var lombok_jar: string = null_string
+    if exists($LOMBOK_PATH)
+      lombok_jar = $LOMBOK_PATH
+    else
+      lombok_jar = expand('~/.local/share/java/lombok.jar')
+    endif
+    if filereadable(lombok_jar)
+      jdtls_args = ['--jvm-arg=-javaagent:' .. lombok_jar]
+    endif
+    call add(servers, {
+        'name': 'jdtls',
+        'filetype': ['java'],
+        'path': 'jdtls',
+        'debug': v:true,
+        'args': jdtls_args,
+        'syncInit': v:true,
+        'rootSearch': ['pom.xml', 'mvnw', 'build.gradle', 'build.gradle.kts', 'settings.gradle', 'settings.gradle.kts', 'gradlew'],
+        'initializationOptions': {'settings': jdtls_settings},
+        'workspaceConfig': jdtls_settings,
+      })
+  endif
+
   if executable('vscode-json-language-server')
     call add(servers, {'name': 'jsonls', 'filetype': ['json', 'jsonc'], 'path': 'vscode-json-language-server', 'args': ['--stdio']})
   endif
@@ -657,7 +724,21 @@ def RegisterLspServers()
   endif
 
   if executable('clangd')
-    call add(servers, {'name': 'clangd', 'filetype': ['c', 'cpp', 'objc', 'objcpp'], 'path': 'clangd', 'args': ['--background-index']})
+    call add(servers, {
+        'name': 'clangd',
+        'filetype': ['c', 'cpp', 'objc', 'objcpp'],
+        'path': 'clangd',
+        'args': [
+          '--completion-style=detailed',
+          '--background-index-priority=normal',
+          '--limit-references=0',
+          '--rename-file-limit=0',
+          '--pch-storage=memory',
+          '--query-driver=/usr/bin/*,/usr/local/bin/*',
+        ],
+        'syncInit': v:true,
+        'rootSearch': ['compile_commands.json', 'compile_flags.txt', '.clangd'],
+      })
   endif
 
   if executable('promql-langserver')
@@ -670,7 +751,7 @@ def RegisterLspServers()
 enddef
 
 def HasPrettierRc(): bool
-  var dir = expand('%:p:h')
+  var dir: string = expand('%:p:h')
   for name in [
     '.prettierrc',
     '.prettierrc.json', '.prettierrc.yaml', '.prettierrc.yml',
@@ -688,9 +769,9 @@ def HasPrettierRc(): bool
 enddef
 
 def PrettierYaml()
-  var view = winsaveview()
-  var src  = getline(1, '$')
-  var out  = systemlist('prettier --stdin-filepath ' .. shellescape(expand('%:p')), src)
+  var view: dict<number> = winsaveview()
+  var src: list<string> = getline(1, '$')
+  var out: list<string> = systemlist('prettier --stdin-filepath ' .. shellescape(expand('%:p')), src)
   if v:shell_error == 0 && !empty(out)
     if out !=# src
       call deletebufline('%', 1, '$')
