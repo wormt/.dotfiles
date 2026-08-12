@@ -155,7 +155,7 @@ highlight netrwExe      guifg=#FFB454
 highlight netrwSymLink  guifg=#95E6CB
 highlight netrwClassify guifg=#5C6773
 
-var inlay_hints_on: bool = true
+var inlay_hints_on: bool = false
 def ToggleInlayHints()
   inlay_hints_on = !inlay_hints_on
   call g:LspOptionsSet({'showInlayHints': inlay_hints_on ? v:true : v:false})
@@ -175,7 +175,7 @@ augroup lsp_options
     \ 'autoHighlightDiags': v:true,
     \ 'autoHighlight': v:true,
     \ 'semanticHighlight': v:true,
-    \ 'showInlayHints': v:true,
+    \ 'showInlayHints': inlay_hints_on ? v:true : v:false,
     \ 'showSignature': v:true,
     \ 'echoSignature': v:true,
     \ 'diagSignErrorText': '✘',
