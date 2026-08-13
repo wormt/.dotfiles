@@ -642,6 +642,16 @@ def RegisterLspServers()
       })
   endif
 
+  if executable('roc')
+    call add(servers, {
+        'name': 'roc',
+        'filetype': ['roc'],
+        'path': 'roc',
+        'args': ['experimental-lsp'],
+        'syncInit': v:true
+      })
+  endif
+
   if executable('jdtls')
     var jdtls_settings: dict<any> = {
         'java': {
