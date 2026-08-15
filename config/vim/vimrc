@@ -443,6 +443,10 @@ def RegisterLspServers()
     call add(servers, {'name': 'dhall', 'filetype': ['dhall'], 'path': 'dhall-lsp-server', 'args': []})
   endif
 
+  if executable('some-sass-language-server')
+    call add(servers, {'name': 'some-sass-language-server', 'filetype': ['scss'], 'path': 'some-sass-language-server', 'args': ['--stdio']})
+  endif
+
   if executable('pwsh')
     var pses_paths: list<string> = [
         expand('~/.local/share/powershell/Modules/PowerShellEditorServices/Start-EditorServices.ps1'),
