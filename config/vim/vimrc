@@ -700,13 +700,15 @@ def RegisterLspServers()
       }
     var jdtls_args: list<string> = []
     var lombok_jar: string = null_string
-    if exists($LOMBOK_PATH)
+    if exists('$LOMBOK_PATH')
       lombok_jar = $LOMBOK_PATH
     else
       lombok_jar = expand('~/.local/share/java/lombok.jar')
     endif
     if filereadable(lombok_jar)
-      jdtls_args = ['--jvm-arg=-javaagent:' .. lombok_jar]
+      jdtls_args = [$'--jvm-arg=-javaagent:{lombok_jar}']
+    else
+      echom $'jdtls: lombok jar not found at {lombok_jar}. (set LOMBOK_PATH or install lombok.jar)'
     endif
     call add(servers, {
         'name': 'jdtls',
@@ -775,7 +777,7 @@ def HasPrettierRc(): bool
     'prettier.config.js', 'prettier.config.cjs', 'prettier.config.mjs',
     'prettier.config.ts', 'prettier.config.cts', 'prettier.config.mts'
   ]
-    if !empty(findfile(name, dir .. ';'))
+    if !empty(findfile(name, '{dir};'))
       return true
     endif
   endfor
