@@ -2,22 +2,30 @@
 
 # for nickel:
 cd nickel
-let nickel_src = "policy.ncl"
-let nickel_output = "~/.config/containers/policy.json"
-mkdir ($nickel_output | path expand | path dirname)
+let nickel_configs = (open --raw host.kdl | from kdl | get 0.children)
 
-let host_ncl = if ("host.ncl" | path exists) {
-  cat host.ncl
-} else {
-  "{}"
+for config in $nickel_configs {
+  let src = ($config.children | where name == "src" | first | get args.0)
+  let output = ($config.children | where name == "output" | first | get args.0)
+  let format = ($config.children | where name == "format" | first | get args.0)
+  # expand key=@file overrides to file contents
+  let args = ($config.children | where name == "override" | each {|override|
+    let value = $override.args.0
+    let expanded = if ($value | str contains "=@") {
+      let parts = ($value | split row "=@")
+      let file = $parts.1
+      let content = if ($file | path exists) { cat $file } else { "{}" }
+      $"($parts.0)=($content)"
+    } else { $value }
+    ["--override", $expanded]
+  } | flatten)
+
+  let dest = ($output | path expand)
+  mkdir ($dest | path dirname)
+  # customize-mode args (--override etc.) must follow the `--` separator
+  nickel export $src --format $format -- ...$args | save -f $dest
+  print $"nickel ($src) -> ($dest)"
 }
-
-(
-  nickel export $nickel_src -- "inputs.keys_dir=\"/usr/etc/pki\""
-  --override $"inputs.host_insecure = ($host_ncl)"
-  | save -f ($nickel_output | path expand)
-)
-print $"nickel policy.json -> ($nickel_output)"
 
 # for dhall:
 # host.yaml format is a list of dicts with the following schema:
