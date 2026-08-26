@@ -1,0 +1,20 @@
+// host specific Nickel configs
+configs {
+  policy {
+    src "policy.ncl"
+    output "~/.config/containers/policy.json"
+    format "json"
+    override "inputs.keys_dir=\"/usr/etc/pki\""
+    override "inputs.host_insecure=@host.ncl"
+  }
+  herdr {
+    src "herdr.ncl"
+    output "~/.config/herdr/config.toml"
+    format "toml"
+  }
+  alacritty {
+    src "alacritty.ncl"
+    output "~/.config/alacritty/alacritty.toml"
+    format "toml"
+  }
+}
