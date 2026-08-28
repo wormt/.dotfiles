@@ -54,37 +54,14 @@ syntax on
 imap <C-BS> <C-W>
 cnoremap %% <C-R>=fnameescape(expand("%:p:h")."/")<CR>
 
-if has('clipboard_provider') && executable('wl-copy')
-  set t_fd=
-  set t_fe=
-  def WlClipCopy(reg: string, regtype: string, lines: list<string>)
-    call system('wl-copy', join(lines, "\n") .. (regtype[0] ==# 'V' ? "\n" : ''))
-    if v:shell_error != 0
-      echohl WarningMsg | echom 'wl-copy failed' | echohl None
-    endif
-  enddef
-
-  def WlClipPaste(reg: string): list<any>
-    var lines: list<string> = systemlist('wl-paste --no-newline')
-    if v:shell_error != 0
-      return []   # invalid return = register left unchanged, per the docs
-    endif
-    return ['', lines]
-  enddef
-
-  v:clipproviders['wl'] = {
-    available: () => !empty($WAYLAND_DISPLAY),
-    copy:  {'+': WlClipCopy,  '*': WlClipCopy},
-    paste: {'+': WlClipPaste, '*': WlClipPaste},
-  }
-  set clipmethod^=wl
-endif
-
 # git clone https://github.com/k-takata/minpac.git ~/.config/vim/pack/minpac/opt/minpac
 def PackInit()
   packadd minpac
   call minpac#init()
   call minpac#add('k-takata/minpac', {'type': 'opt'})
+
+  # wl-clipboard clipboard provider
+  call minpac#add('wormt/vim9-wlclip')
 
   # colorscheme
   call minpac#add('ayu-theme/ayu-vim')
