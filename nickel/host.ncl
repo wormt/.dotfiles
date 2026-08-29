@@ -6,6 +6,7 @@
   "quay.io/k0sproject/pause" = [{ type = "insecureAcceptAnything" }],
   "quay.io/k0sproject" = [{ type = "insecureAcceptAnything" }],
   "quay.io/cilium" = [{ type = "insecureAcceptAnything" }],
+  "quay.io/fedora/fedora-bootc" = [{ type = "insecureAcceptAnything" }],
   "cgr.dev/chainguard" = [{ type = "insecureAcceptAnything" }],
   "ghcr.io/ggml-org/llama.cpp" = [{ type = "insecureAcceptAnything" }],
   "docker.io/vagrantlibvirt/vagrant-libvirt" = [{ type = "insecureAcceptAnything" }],
