@@ -78,7 +78,7 @@ def PackInit()
   #useful shortcuts
   call minpac#add('ubaldot/vim-op-surround')
   call minpac#add('mao-yining/undotree.vim')
-  call minpac#add('tpope/vim-commentary')
+  packadd comment
 
   #repl
   call minpac#add('ubaldot/vim-replica')
