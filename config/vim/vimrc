@@ -712,6 +712,10 @@ def RegisterLspServers()
     call add(servers, {'name': 'awkls', 'filetype': ['awk'], 'path': 'awk-language-server', 'args': []})
   endif
 
+  if executable('baml')
+    call add(servers, {'name': 'baml', 'filetype': ['baml'], 'path': 'baml', 'args': ['lsp']})
+  endif
+
   if executable('csharp-ls')
     call add(servers, {'name': 'csharp-ls', 'filetype': ['cs'], 'path': 'csharp-ls', 'args': []})
   endif
@@ -799,6 +803,7 @@ augroup lsp_filetypes
   au BufRead,BufNewFile *.jsonld setlocal filetype=json
   au BufRead,BufNewFile *.toml,Cargo.lock setlocal filetype=toml
   au BufRead,BufNewFile *.awk,*.gawk setlocal filetype=awk
+  au BufRead,BufNewFile *.baml setlocal filetype=baml
   au BufRead,BufNewFile *.csx setlocal filetype=cs
   au BufRead,BufNewFile *.promql setlocal filetype=promql
   au BufRead,BufNewFile *.hcl setlocal filetype=hcl
