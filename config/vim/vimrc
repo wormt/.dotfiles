@@ -386,7 +386,17 @@ def RegisterLspServers()
   endif
 
   if executable('bash-language-server')
-    call add(servers, {'name': 'bashls', 'filetype': ['sh', 'bash'], 'path': 'bash-language-server', 'args': ['start']})
+    var bash_opts: dict<any> = {
+      'includeAllWorkspaceSymbols': v:true,
+      'shellcheckExternalSources': v:true,
+    }
+    call add(servers, {
+      'name': 'bashls',
+      'filetype': ['sh', 'bash'],
+      'path': 'bash-language-server',
+      'args': ['start'],
+      'initializationOptions': bash_opts
+    })
   endif
 
   if executable('nixd')
