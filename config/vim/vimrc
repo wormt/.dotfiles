@@ -67,7 +67,8 @@ def PackInit()
   call minpac#add('ayu-theme/ayu-vim')
 
   #lsp/linting/formatting
-  call minpac#add('yegappan/lsp')
+  #call minpac#add('yegappan/lsp')
+  call minpac#add('wormt/lsp', {'frozen': v:true})
   call minpac#add('dense-analysis/ale')
   call minpac#add('nickel-lang/vim-nickel')
 
