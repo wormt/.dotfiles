@@ -14,4 +14,4 @@ right now my main setup looks like:
 - [nushell](https://www.nushell.sh/) 113
 - [Ghostty](https://ghostty.org/)
 
-![A screenshot of my desktop.](desktop.webp)
+![A screencast of my desktop.](desktop.gif)
