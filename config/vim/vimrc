@@ -690,6 +690,9 @@ def RegisterLspServers()
     var lombok_jar: string = null_string
     if exists('$LOMBOK_PATH')
       lombok_jar = $LOMBOK_PATH
+      if lombok_jar =~# '^-javaagent[=:]'
+        lombok_jar = lombok_jar[11 : ]
+      endif
     else
       lombok_jar = expand('~/.local/share/java/lombok.jar')
     endif
