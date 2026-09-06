@@ -200,8 +200,11 @@ highlight CursorLineConceal guibg=#1B232C guifg=#5C6773
 highlight VertSplit  guifg=#5C6773 guibg=NONE gui=NONE
 highlight WinSeparator guifg=#5C6773 guibg=NONE gui=NONE
 
-g:ale_disable_lsp = 1
+g:ale_disable_lsp = 0
 g:ale_linters_explicit = 1
+g:ale_linters = {
+    'racket': ['racket_langserver'],
+}
 g:ale_fix_on_save = 1
 g:ale_fixers = {
     'zig':        ['zigfmt'],
