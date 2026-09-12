@@ -62,3 +62,6 @@ password.txt
 
 # venv
 .nix-chroot/
+
+# rendered by nickel/gsettings.ncl
+config/dconf

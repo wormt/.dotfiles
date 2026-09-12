@@ -17,4 +17,9 @@ configs {
     output "~/.config/alacritty/alacritty.toml"
     format "toml"
   }
+  gsettings {
+    src "gsettings.ncl"
+    output "../config/dconf/dump.dconf"
+    format "text"
+  }
 }
