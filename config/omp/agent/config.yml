@@ -50,7 +50,7 @@ prewalk:
   enabled: false
 stt:
   modelName: parakeet
-hideThinkingBlock: false
+hideThinkingBlock: true
 disabledExtensions:
   []
 dev:
@@ -60,3 +60,7 @@ retry:
   fallbackChains:
     llama.cpp/*:
       - kimi-code/k3-256k
+bash:
+  allowCompoundCommands: true
+python:
+  kernelMode: session
