@@ -27,7 +27,7 @@ $env.XKB_DEFAULT_MODEL = "pc104"
 $env.XKB_DEFAULT_LAYOUT = "us"
 $env.RLIMIT_RTPRIO = "88"
 
-$env.PATH = $env.PATH | prepend [($env.HOME + "/.local/bin"),"/home/linuxbrew/.linuxbrew/bin",($env.HOME + "/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/"),($env.HOME + "/.cargo/bin"),($env.HOME + "/.dotnet/tools"),($env.HOME + "/.local/share/fnm/node-versions/lts/installation/bin")] | uniq
+$env.PATH = $env.PATH | prepend [($env.HOME + "/.local/bin"),"/home/linuxbrew/.linuxbrew/bin",($env.HOME + "/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/"),($env.HOME + "/.cargo/bin"),($env.HOME + "/.dotnet/tools"),($env.HOME + "/.local/share/fnm/node-versions/lts/installation/bin"),($env.HOME + "/.deno/bin")] | uniq
 if 'DEVSHELL_DIR' in $env {
   $env.PATH = ($env.PATH | prepend $"($env.DEVSHELL_DIR)/bin")
 }
