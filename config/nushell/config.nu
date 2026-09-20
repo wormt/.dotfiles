@@ -44,6 +44,8 @@ $env.HISTSIZE = 1048576
 
 $env.VIRTUAL_ENV_DISABLE_PROMPT = true
 
+$env.LLAMA_CPP_BASE_URL = 'http://192.168.0.91:30080'
+
 # https://github.com/jlcrochet/fast-completer
 # $env.config.completions.external = {
 #     enable: true
