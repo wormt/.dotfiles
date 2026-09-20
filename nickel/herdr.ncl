@@ -1,5 +1,4 @@
 # herdr config, templated in Nickel. Rendered to ~/.config/herdr/config.toml.
-
 let Ayu = import "palette.ncl" in
 
 let RowCellRecord = {
@@ -7,68 +6,80 @@ let RowCellRecord = {
   bold | Bool | optional,
   dim | Bool | optional,
   fg | String | optional,
-} in
+}
+in
 
-let RowCell = std.contract.any_of [String, RowCellRecord] in
+let RowCell = std.contract.any_of [ String, RowCellRecord] in
 
 let main = {
   inputs | not_exported = {
     palette
       | { accent | String, bg | String, selection | String, branch | String, git_status | String, .. }
       | doc "Ayu palette shared with Ghostty"
-      | default = Ayu,
+      | default
+      = Ayu,
 
     toast_delivery
       | String
       | doc "toast delivery: system (D-Bus), terminal, or osc9"
-      | default = "system",
+      | default
+      = "system",
 
     sound_enabled
       | Bool
       | doc "master sound toggle"
-      | default = true,
+      | default
+      = true,
 
     sound_agents
       | { _ : String }
       | doc "per-agent sound map, e.g. { pi = \"on\" }"
-      | default = { pi = "on" },
+      | default
+      = { pi = "on" },
   },
 
   onboarding
     | Bool
     | doc "skip first-run onboarding"
-    | default = false,
+    | default
+    = false,
 
   ui = {
     status_indicators
       | String
       | doc "status indicator style: symbols or text"
-      | default = "symbols",
+      | default
+      = "symbols",
 
     show_agent_labels_on_pane_borders
       | Bool
       | doc "show agent labels on pane borders"
-      | default = true,
+      | default
+      = true,
 
     agent_panel_sort
       | String
       | doc "agent panel sort order"
-      | default = "spaces",
+      | default
+      = "spaces",
 
     accent
       | String
       | doc "Ayu signature orange"
-      | default = inputs.palette.accent,
+      | default
+      = inputs.palette.accent,
 
     tab_bar_position
       | String
       | doc "tab bar position: bottom (vim-statusline vibe) or top"
-      | default = "bottom",
+      | default
+      = "bottom",
 
     tab_bar_right
       | Array { type | String, format | String | optional }
       | doc "right-side tab bar widgets"
-      | default = [
+      | default
+      = [
         { type = "zoom" },
         { type = "hostname" },
         { type = "datetime", format = "%H:%M" },
@@ -77,29 +88,34 @@ let main = {
     window_title
       | String
       | doc "window title template"
-      | default = "{hostname}: {workspace} · {tab}",
+      | default
+      = "{hostname}: {workspace} · {tab}",
 
     sidebar_width
       | Number
       | doc "sidebar width"
-      | default = 30,
+      | default
+      = 30,
 
     sidebar_min_width
       | Number
       | doc "sidebar minimum width"
-      | default = 20,
+      | default
+      = 20,
 
     sidebar_max_width
       | Number
       | doc "sidebar maximum width"
-      | default = 38,
+      | default
+      = 38,
 
     sidebar = {
       agents = {
         rows
           | Array (Array RowCell)
           | doc "agent sidebar row templates"
-          | default = [
+          | default
+          = [
             ["state_icon", { token = "workspace", bold = true }, { token = "tab", dim = true }],
             ["state_text", { token = "agent", bold = true }],
             [{ token = "terminal_title_stripped", dim = true }],
@@ -110,7 +126,8 @@ let main = {
         rows
           | Array (Array RowCell)
           | doc "spaces sidebar row templates"
-          | default = [
+          | default
+          = [
             ["state_icon", { token = "workspace", bold = true }],
             [
               { token = "branch", fg = inputs.palette.branch },
@@ -124,30 +141,35 @@ let main = {
       delivery
         | String
         | doc "toast delivery: system (D-Bus), terminal, or osc9"
-        | default = inputs.toast_delivery,
+        | default
+        = inputs.toast_delivery,
 
       delay_seconds
         | Number
         | doc "toast delay in seconds (0 = instant)"
-        | default = 0,
+        | default
+        = 0,
 
       herdr = {
         position
           | String
           | doc "herdr toast position"
-          | default = "top-right",
+          | default
+          = "top-right",
       },
 
       clipboard = {
         enabled
           | Bool
           | doc "clipboard toast enabled"
-          | default = true,
+          | default
+          = true,
 
         position
           | String
           | doc "clipboard toast position"
-          | default = "top-right",
+          | default
+          = "top-right",
       },
     },
 
@@ -155,12 +177,14 @@ let main = {
       enabled
         | Bool
         | doc "master sound toggle"
-        | default = inputs.sound_enabled,
+        | default
+        = inputs.sound_enabled,
 
       agents
         | { _ : String }
         | doc "per-agent sound map"
-        | default = inputs.sound_agents,
+        | default
+        = inputs.sound_agents,
     },
   },
 
@@ -168,44 +192,79 @@ let main = {
     name
       | String
       | doc "theme name"
-      | default = "terminal",
+      | default
+      = "terminal",
 
     auto_switch
       | Bool
       | doc "auto-switch theme"
-      | default = false,
+      | default
+      = false,
 
     custom = {
       accent
         | String
         | doc "Ayu signature orange"
-        | default = inputs.palette.accent,
+        | default
+        = inputs.palette.accent,
 
       active_row_bg
         | String
         | doc "Ayu Mirage bg — focused-row pop"
-        | default = inputs.palette.bg,
+        | default
+        = inputs.palette.bg,
 
       selection_bg
         | String
         | doc "selection background"
-        | default = inputs.palette.selection,
+        | default
+        = inputs.palette.selection,
     },
+  },
+
+  terminal = {
+    default_shell
+      | String
+      | doc "Executable used for new interactive panes. Empty means SHELL, then /bin/sh."
+      | default
+      = "nu",
   },
 
   experimental = {
     kitty_graphics
       | Bool
-      | doc "pane image rendering; disable if any glitch"
-      | default = true,
+      | doc "pane image rendering; disable les/bin/vim-open')
+if any glitch"
+      | default
+      = true,
   },
 
   advanced = {
     scrollback_limit_bytes
       | Number
       | doc "scrollback buffer limit in bytes"
-      | default = 25000000,
+      | default
+      = 25000000,
+  },
+
+  keys = {
+    previous_agent
+      | String
+      | doc "focus the previous agent in the panel"
+      | default
+      = "prefix+shift+h",
+
+    next_agent
+      | String
+      | doc "focus the next agent in the panel"
+      | default
+      = "prefix+shift+l",
+
+    focus_agent
+      | String
+      | doc "focus an agent by index 1-9 (mirrors switch_tab's range syntax)"
+      | default
+      = "prefix+alt+1..9",
   },
 }
-
 in main

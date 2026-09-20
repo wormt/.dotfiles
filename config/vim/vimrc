@@ -31,6 +31,7 @@ set undofile
 set swapfile
 set directory=~/.cache/vim/swap
 set undodir=~/.cache/vim/undo
+set autoread
 set path+=**
 set wildmenu
 set wildmode=longest:full,full
@@ -48,10 +49,16 @@ augroup terminal_setup
   au!
   autocmd TerminalOpen * setlocal nospell nonumber nobuflisted textwidth=0 winheight=1
 augroup END
+# OMP edits files underneath vim; without checktime the
+# buffer keeps stale content and a :w would clobber their work.
+augroup agent_file_watch
+  au!
+  autocmd FocusGained,BufEnter,CursorHold,CursorHoldI * checktime
+augroup END
 filetype plugin on
 filetype plugin indent on
 syntax on
-imap <C-BS> <C-W>
+inoremap <C-BS> <C-W>
 cnoremap %% <C-R>=fnameescape(expand("%:p:h")."/")<CR>
 
 # git clone https://github.com/k-takata/minpac.git ~/.config/vim/pack/minpac/opt/minpac
@@ -87,6 +94,25 @@ def PackInit()
   # vimwiki :)
   call minpac#add('vimwiki/vimwiki')
 enddef
+
+# herdr pane navigation in vim
+def HerdrFocus(dir: string)
+  var bin = empty($HERDR_BIN_PATH) ? 'herdr' : $HERDR_BIN_PATH
+  system($'{bin} pane focus --direction {dir} --pane {shellescape($HERDR_PANE_ID)}')
+enddef
+
+def Nav(cmd: string, dir: string)
+  var prev = winnr()
+  execute 'wincmd ' .. cmd
+  if winnr() == prev && !empty($HERDR_PANE_ID)
+    HerdrFocus(dir)
+  endif
+enddef
+
+nnoremap <silent> <C-h> <ScriptCmd>Nav('h', 'left')<CR>
+nnoremap <silent> <C-j> <ScriptCmd>Nav('j', 'down')<CR>
+nnoremap <silent> <C-k> <ScriptCmd>Nav('k', 'up')<CR>
+nnoremap <silent> <C-l> <ScriptCmd>Nav('l', 'right')<CR>
 
 command! PackUpdate source $MYVIMRC | call PackInit() | call minpac#update()
 command! PackClean  source $MYVIMRC | call PackInit() | call minpac#clean()

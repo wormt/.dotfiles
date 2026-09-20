@@ -1,0 +1,146 @@
+#!/usr/bin/env bash
+#
+# vim-open [--list] [--edit] [--force] [--any-workspace] [-p PANE] FILE[:LINE[:COL]]
+#
+# Open a file in the Vim already running inside a herdr pane, instead of
+# spawning a new editor. herdr has no "run a command in this pane's vim"
+# channel, so this drives Vim's own command line through pane input:
+# Escape, then `:execute 'tabedit' fnameescape('<path>')` (+ `:call cursor()`
+# when a line is given). Escaping is Vim's own, so spaces, %, #, |, ", \
+# and single quotes all survive.
+#
+# It opens a NEW TAB by default, so the session you are in keeps its window
+# layout and buffers. It does send Escape first, so an in-progress cmdline,
+# visual selection, or pending operator is cancelled.
+#
+# Targets the caller's workspace only; a vim in another workspace is a
+# different screen, so it must be named with -p (or --any-workspace).
+#
+# Needs $HERDR_ENV=1 (run from inside a herdr pane) and `jq`.
+
+set -euo pipefail
+
+list_only=0
+in_place=0
+force=0
+any_workspace=0
+pane="${HERDR_VIM_PANE:-}"
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --list|-l) list_only=1; shift ;;
+    --edit|-e) in_place=1; shift ;;
+    --force) force=1; shift ;;
+    --any-workspace) any_workspace=1; shift ;;
+    -p|--pane) pane="${2:?--pane needs a pane id}"; shift 2 ;;
+    --) shift; break ;;
+    -*) echo "vim-open: unknown option: $1" >&2; exit 2 ;;
+    *) break ;;
+  esac
+done
+
+if [ "$list_only" -eq 0 ]; then
+  target="${1:?usage: vim-open [--list] [--edit] [--force] [--any-workspace] [-p PANE] FILE[:LINE[:COL]]}"
+  [ $# -gt 1 ] && { echo "vim-open: too many arguments" >&2; exit 2; }
+else
+  target=""
+fi
+
+herdr="${HERDR_BIN_PATH:-herdr}"
+file=""; line=""; col=""
+
+if [ "$list_only" -eq 0 ]; then
+  # Split the optional :LINE[:COL] suffix, but only when the tail is numeric so
+  # paths containing colons still work.
+  file="$target"
+  if [[ "$target" =~ ^(.*):([0-9]+):([0-9]+)$ ]]; then
+    file="${BASH_REMATCH[1]}"; line="${BASH_REMATCH[2]}"; col="${BASH_REMATCH[3]}"
+  elif [[ "$target" =~ ^(.*):([0-9]+)$ ]]; then
+    file="${BASH_REMATCH[1]}"; line="${BASH_REMATCH[2]}"
+  fi
+  file="$(realpath -e -- "$file")" || { echo "vim-open: no such file: $target" >&2; exit 1; }
+fi
+
+# Vim foreground process names, same matcher vim-tmux-navigator uses.
+vim_re='^g?(view|l?n?vim?x?)(diff)?$'
+
+pane_foreground() {
+  "$herdr" pane process-info --pane "$1" 2>/dev/null \
+    | jq -r '[.result.process_info.foreground_processes[]?.name | ascii_downcase] | .[0] // ""' 2>/dev/null || true
+}
+
+pane_is_vim() {
+  printf '%s' "$(pane_foreground "$1")" | grep -Eq "$vim_re"
+}
+
+pane_is_focused() {
+  [ "$("$herdr" pane get "$1" | jq -r '.result.pane.focused' 2>/dev/null)" = "true" ]
+}
+
+# One `herdr pane list` (no --workspace) covers every workspace; the caller's
+# workspace sorts first, then a focused pane, then layout order.
+list_candidates() {
+  local workspace="$1" same="" other="" focused="" rest=""
+  for candidate in $("$herdr" pane list | jq -r '.result.panes[].pane_id'); do
+    pane_is_vim "$candidate" || continue
+    if [ "${candidate%%:*}" = "$workspace" ]; then
+      if pane_is_focused "$candidate"; then focused="$focused $candidate"; else same="$same $candidate"; fi
+    else
+      other="$other $candidate"
+    fi
+  done
+  printf '%s\n%s\n%s\n' "$focused" "$same" "$other" | tr ' ' '\n' | grep -v '^$' || true
+}
+
+if [ "$list_only" -eq 1 ]; then
+  list_candidates "${HERDR_WORKSPACE_ID:-}"
+  exit 0
+fi
+
+if [ -z "$pane" ]; then
+  [ "${HERDR_ENV:-}" = "1" ] || { echo "vim-open: not inside a herdr pane (set HERDR_VIM_PANE or -p to target one)" >&2; exit 1; }
+  workspace="${HERDR_WORKSPACE_ID:?HERDR_WORKSPACE_ID is unset}"
+  all_candidates="$(list_candidates "$workspace")"
+  candidates="$(printf '%s\n' "$all_candidates" | grep "^${workspace}:" || true)"
+  if [ -z "$candidates" ]; then
+    if [ -n "$all_candidates" ] && [ "$any_workspace" -eq 0 ]; then
+      echo "vim-open: no vim in workspace $workspace; other workspaces have: $(printf '%s' "$all_candidates" | tr '\n' ' ')" >&2
+      echo "vim-open: re-run with -p <pane> to hand it to one of those (a different workspace is a different screen)" >&2
+      exit 1
+    fi
+    [ "$any_workspace" -eq 1 ] && candidates="$all_candidates"
+  fi
+  [ -n "$candidates" ] || { echo "vim-open: no herdr pane is running vim" >&2; exit 1; }
+  pane="$(printf '%s\n' "$candidates" | head -1)"
+  others="$(printf '%s\n' "$candidates" | tail -n +2 | tr '\n' ' ')"
+  [ -n "$others" ] && echo "vim-open: also running vim: $others (override with -p)" >&2
+else
+  # An explicit pane is never trusted blindly: herdr pane input lands in
+  # whatever owns the pane, so a stale or mistyped id would type this command
+  # line into a shell (where Enter runs it) or into an agent's prompt.
+  if ! pane_is_vim "$pane" && [ "$force" -eq 0 ]; then
+    echo "vim-open: $pane is not running vim (foreground: $(pane_foreground "$pane")); pass --force to send anyway" >&2
+    exit 1
+  fi
+fi
+
+# Vim does the real escaping: a single-quoted Vim string (with ' doubled) fed to
+# fnameescape() survives spaces, %, #, |, ", backslashes, and quotes.
+vim_path="${file//\'/\'\'}"
+"$herdr" pane send-keys "$pane" esc >/dev/null
+# A new tab by default: the user's window layout and buffers stay as they were.
+# --edit reuses the current window, and then Vim refuses with E37 when that
+# buffer has unsaved changes — the tab form is the reliable one.
+if [ "$in_place" -eq 1 ]; then cmd="edit"; else cmd="tabedit"; fi
+"$herdr" pane send-text "$pane" ":execute '$cmd' fnameescape('$vim_path')" >/dev/null
+"$herdr" pane send-keys "$pane" enter >/dev/null
+if [ -n "$line" ]; then
+  if [ -n "$col" ]; then
+    "$herdr" pane send-text "$pane" ":call cursor($line, $col)" >/dev/null
+  else
+    "$herdr" pane send-text "$pane" ":call cursor($line, 1)" >/dev/null
+  fi
+  "$herdr" pane send-keys "$pane" enter >/dev/null
+fi
+
+echo "vim-open: $file${line:+:$line}${col:+:$col} -> $pane"
