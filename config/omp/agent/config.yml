@@ -2,11 +2,11 @@ providers:
   webSearchOrder:
     []
 modelRoles:
-  default: openrouter/deepseek/deepseek-v4.1-flash
   smol: llama.cpp/qwen3.8-27b
-  slow: openrouter/deepseek/deepseek-v4.1-flash
-  plan: openrouter/deepseek/deepseek-v4.1-flash
-  task: openrouter/deepseek/deepseek-v4.1-flash
+  plan: kimi-code/k3
+  task: kimi-code/k3-256k
+  default: kimi-code/k3-256k
+  slow: kimi-code/k3:high
 symbolPreset: ascii
 composer:
   shape: borderless
@@ -50,8 +50,13 @@ prewalk:
   enabled: false
 stt:
   modelName: parakeet
-hideThinkingBlock: true
+hideThinkingBlock: false
 disabledExtensions:
   []
 dev:
   autoqaConsent: granted
+defaultThinkingLevel: auto
+retry:
+  fallbackChains:
+    llama.cpp/*:
+      - kimi-code/k3-256k
