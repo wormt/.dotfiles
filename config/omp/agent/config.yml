@@ -1,0 +1,57 @@
+providers:
+  webSearchOrder:
+    []
+modelRoles:
+  default: openrouter/deepseek/deepseek-v4.1-flash
+  smol: llama.cpp/qwen3.8-27b
+  slow: openrouter/deepseek/deepseek-v4.1-flash
+  plan: openrouter/deepseek/deepseek-v4.1-flash
+  task: openrouter/deepseek/deepseek-v4.1-flash
+symbolPreset: ascii
+composer:
+  shape: borderless
+  tokenRate: true
+theme:
+  dark: dark-copper
+setupVersion: 2
+memory:
+  backend: sharpshooter
+autolearn:
+  enabled: true
+edit:
+  mode: hashline
+readLineNumbers: true
+colorBlindMode: false
+statusLine:
+  preset: default
+  separator: ascii
+  contextLine: embedded
+  transparent: false
+tui:
+  textSizing: false
+  vimMode: true
+display:
+  showTurnTime: true
+  showTokenUsage: true
+  shimmer: kitt
+  cacheMissMarker: true
+steeringMode: one-at-a-time
+task:
+  showResolvedModelBadge: true
+astGrep:
+  enabled: true
+github:
+  enabled: true
+secrets:
+  enabled: false
+terminal:
+  showProgress: true
+prewalk:
+  enabled: false
+stt:
+  modelName: parakeet
+hideThinkingBlock: true
+disabledExtensions:
+  []
+dev:
+  autoqaConsent: granted
