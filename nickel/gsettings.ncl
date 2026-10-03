@@ -47,13 +47,43 @@ let render
   = fun sections => std.string.join "\n" (std.array.map renderSection sections)
 in
 
+let common = {
+  horizontal_margin = 8,
+  vertical_margin = 6,
+  window_gap = 8,
+
+  close_window = ["<Shift><Super>q"],
+  cycle_height_backwards = ["<Super><Alt><Shift>r"],
+  cycle_width_backwards = ["<Super><Alt>r"],
+  dec_window_height = ["<Shift><Super>underscore"],
+  dec_window_width = ["<Shift><Super>braceleft"],
+  focus_monitor_above = ["<Alt><Super>k"],
+  focus_monitor_below = ["<Alt><Super>j"],
+  focus_monitor_left = ["<Alt><Super>h"],
+  focus_monitor_right = ["<Alt><Super>l"],
+  focus_window_down = ["<Super>j"],
+  focus_window_left = ["<Super>h"],
+  focus_window_right = ["<Super>l"],
+  focus_window_up = ["<Super>k"],
+  inc_window_width = ["<Shift><Super>braceright"],
+  move_to_monitor_above = ["<Shift><Control><Super>k"],
+  move_to_monitor_below = ["<Shift><Control><Super>j"],
+  move_to_monitor_left = ["<Shift><Control><Super>h"],
+  move_to_monitor_right = ["<Shift><Control><Super>l"],
+  move_window_down = ["<Shift><Super>j"],
+  move_window_left = ["<Shift><Super>h"],
+  move_window_right = ["<Shift><Super>l"],
+  move_window_up = ["<Shift><Super>k"],
+}
+in
+
 let albumwm = {
   path = "org/gnome/shell/extensions/albumwm",
   keys = {
     "column-gap"
       | Integer
       | doc "horizontal space between tiled columns"
-      = 8,
+      = common.window_gap,
     "gesture-enabled"
       | Bool
       | doc "touchpad swipe gestures for panning"
@@ -65,11 +95,11 @@ let albumwm = {
     "horizontal-margin"
       | Integer
       | doc "left/right margin inside the work area"
-      = 8,
+      = common.horizontal_margin,
     "vertical-margin"
       | Integer
       | doc "top/bottom margin inside the work area"
-      = 6,
+      = common.vertical_margin,
     "warp-pointer-on-focus"
       | Bool
       | doc "warp the pointer onto a window when it gets focus"
@@ -88,85 +118,85 @@ let albumwm_keybindings = {
     "close-window"
       | Array String
       | doc "close the focused window"
-      = ["<Shift><Super>q"],
+      = common.close_window,
     "cycle-focus-modes"
       | Array String
       | doc "cycle default/center/edge focus mode"
       = [""],
     "cycle-preset-column-width-backwards"
       | Array String
-      = ["<Super><Alt>r"],
+      = common.cycle_width_backwards,
     "cycle-preset-window-height-backwards"
       | Array String
-      = ["<Super><Alt><Shift>r"],
+      = common.cycle_height_backwards,
     "dec-column-width"
       | Array String
       | doc "decrease the focused column's width"
-      = ["<Shift><Super>braceleft"],
+      = common.dec_window_width,
     "dec-window-height"
       | Array String
       | doc "decrease the focused window's height"
-      = ["<Shift><Super>underscore"],
+      = common.dec_window_height,
     "focus-column-left"
       | Array String
       | doc "focus the column to the left"
-      = ["<Super>h"],
+      = common.focus_window_left,
     "focus-column-right"
       | Array String
       | doc "focus the column to the right"
-      = ["<Super>l"],
+      = common.focus_window_right,
     "focus-monitor-above"
       | Array String
-      = ["<Alt><Super>k"],
+      = common.focus_monitor_above,
     "focus-monitor-below"
       | Array String
-      = ["<Alt><Super>j"],
+      = common.focus_monitor_below,
     "focus-monitor-left"
       | Array String
-      = ["<Alt><Super>h"],
+      = common.focus_monitor_left,
     "focus-monitor-right"
       | Array String
-      = ["<Alt><Super>l"],
+      = common.focus_monitor_right,
     "focus-window-down"
       | Array String
       | doc "focus the window below"
-      = ["<Super>j"],
+      = common.focus_window_down,
     "focus-window-up"
       | Array String
       | doc "focus the window above"
-      = ["<Super>k"],
+      = common.focus_window_up,
     "inc-column-width"
       | Array String
       | doc "increase the focused column's width"
-      = ["<Shift><Super>braceright"],
+      = common.inc_window_width,
     "move-column-left"
       | Array String
       | doc "move the focused column left"
-      = ["<Shift><Super>h"],
+      = common.move_window_left,
     "move-column-right"
       | Array String
       | doc "move the focused column right"
-      = ["<Shift><Super>l"],
+      = common.move_window_right,
     "move-window-down"
       | Array String
       | doc "move the focused window down"
-      = ["<Shift><Super>j"],
+      = common.move_window_down,
     "move-window-to-monitor-above"
       | Array String
-      = ["<Shift><Control><Super>k"],
+      = common.move_to_monitor_above,
     "move-window-to-monitor-below"
       | Array String
-      = ["<Shift><Control><Super>j"],
+      = common.move_to_monitor_below,
     "move-window-to-monitor-left"
       | Array String
-      = ["<Shift><Control><Super>h"],
+      = common.move_to_monitor_left,
     "move-window-to-monitor-right"
       | Array String
-      = ["<Shift><Control><Super>l"],
+      = common.move_to_monitor_right,
     "move-window-up"
       | Array String
       | doc "move the focused window up"
-      = ["<Shift><Super>k"],
+      = common.move_window_up,
     "switch-focus-between-floating-and-tiling"
       | Array String
       = ["<Super>s"],
@@ -174,6 +204,202 @@ let albumwm_keybindings = {
       | Array String
       | doc "toggle the focused window floating"
       = ["<Shift><Super>s"],
+  },
+}
+in
+
+let paperwm = {
+  path = "org/gnome/shell/extensions/paperwm",
+  keys = {
+    "disable-topbar-styling"
+      | Bool
+      | doc "don't restyle the GNOME top bar"
+      = true,
+    "gesture-enabled"
+      | Bool
+      | doc "touchpad swipe gestures for panning"
+      = true,
+    "horizontal-margin"
+      | Integer
+      | doc "left/right margin inside the work area"
+      = common.horizontal_margin,
+    "only-scratch-in-overview"
+      | Bool
+      | doc "only show scratch windows in the overview"
+      = true,
+    "selection-border-radius-top"
+      | Integer
+      | doc "selection border top corner radius"
+      = 16,
+    "selection-border-size"
+      | Integer
+      | doc "selection border width"
+      = 4,
+    "show-window-position-bar"
+      | Bool
+      | doc "window position bar in the top bar"
+      = false,
+    "vertical-margin"
+      | Integer
+      | doc "top margin inside the work area"
+      = common.vertical_margin,
+    "vertical-margin-bottom"
+      | Integer
+      | doc "bottom margin inside the work area"
+      = common.vertical_margin,
+    "window-gap"
+      | Integer
+      | doc "gap between tiled windows"
+      = common.window_gap,
+    "winprops"
+      | Array String
+      | doc "window property overrides"
+      = [],
+  },
+}
+in
+
+let paperwm_keybindings = {
+  path = "org/gnome/shell/extensions/paperwm/keybindings",
+  keys = {
+    "close-window"
+      | Array String
+      | doc "close the focused window"
+      = common.close_window,
+    "cycle-height-backwards"
+      | Array String
+      = common.cycle_height_backwards,
+    "cycle-width-backwards"
+      | Array String
+      = common.cycle_width_backwards,
+    "move-down"
+      | Array String
+      | doc "move the focused window down"
+      = common.move_window_down,
+    "move-down-workspace"
+      | Array String
+      = ["<Shift><Super>Page_Down"],
+    "move-left"
+      | Array String
+      | doc "move the focused window left"
+      = common.move_window_left,
+    "move-monitor-above"
+      | Array String
+      = common.move_to_monitor_above,
+    "move-monitor-below"
+      | Array String
+      = common.move_to_monitor_below,
+    "move-monitor-left"
+      | Array String
+      = common.move_to_monitor_left,
+    "move-monitor-right"
+      | Array String
+      = common.move_to_monitor_right,
+    "move-right"
+      | Array String
+      | doc "move the focused window right"
+      = common.move_window_right,
+    "move-space-monitor-above"
+      | Array String
+      = [""],
+    "move-space-monitor-below"
+      | Array String
+      = [""],
+    "move-space-monitor-left"
+      | Array String
+      = [""],
+    "move-space-monitor-right"
+      | Array String
+      = [""],
+    "move-up"
+      | Array String
+      | doc "move the focused window up"
+      = common.move_window_up,
+    "move-up-workspace"
+      | Array String
+      = ["<Shift><Super>Page_Up"],
+    "new-window"
+      | Array String
+      | doc "open a new window"
+      = ["<Shift><Super>Return"],
+    "resize-h-dec"
+      | Array String
+      | doc "decrease the focused window's height"
+      = common.dec_window_height,
+    "resize-w-dec"
+      | Array String
+      | doc "decrease the focused window's width"
+      = common.dec_window_width,
+    "resize-w-inc"
+      | Array String
+      | doc "increase the focused window's width"
+      = common.inc_window_width,
+    "swap-monitor-above"
+      | Array String
+      = ["<Shift><Alt><Super>k"],
+    "swap-monitor-below"
+      | Array String
+      = ["<Shift><Alt><Super>j"],
+    "swap-monitor-left"
+      | Array String
+      = ["<Shift><Alt><Super>h"],
+    "swap-monitor-right"
+      | Array String
+      = ["<Shift><Alt><Super>l"],
+    "switch-down"
+      | Array String
+      = [""],
+    "switch-down-loop"
+      | Array String
+      | doc "focus the window below"
+      = common.focus_window_down,
+    "switch-left"
+      | Array String
+      = [""],
+    "switch-left-loop"
+      | Array String
+      | doc "focus the window to the left"
+      = common.focus_window_left,
+    "switch-monitor-above"
+      | Array String
+      = common.focus_monitor_above,
+    "switch-monitor-below"
+      | Array String
+      = common.focus_monitor_below,
+    "switch-monitor-left"
+      | Array String
+      = common.focus_monitor_left,
+    "switch-monitor-right"
+      | Array String
+      = common.focus_monitor_right,
+    "switch-next"
+      | Array String
+      = [""],
+    "switch-previous"
+      | Array String
+      = [""],
+    "switch-right"
+      | Array String
+      = [""],
+    "switch-right-loop"
+      | Array String
+      | doc "focus the window to the right"
+      = common.focus_window_right,
+    "switch-up"
+      | Array String
+      = [""],
+    "switch-up-loop"
+      | Array String
+      | doc "focus the window above"
+      = common.focus_window_up,
+    "toggle-scratch"
+      | Array String
+      | doc "attach/detach the focused window to the scratch layer"
+      = ["<Shift><Super>s"],
+    "toggle-scratch-layer"
+      | Array String
+      | doc "toggle the floating scratch layer"
+      = ["<Super>s"],
   },
 }
 in
@@ -187,7 +413,7 @@ let wm_preferences = {
     "focus-mode"
       | String
       | doc "focus when moving mouse to new window"
-      = "sloppy",
+      = "click",
     "num-workspaces"
       | Integer
       | doc "static workspace count"
@@ -454,6 +680,8 @@ let main =
   render [
     albumwm,
     albumwm_keybindings,
+    paperwm,
+    paperwm_keybindings,
     wm_preferences,
     wm_keybindings,
     mutter,
