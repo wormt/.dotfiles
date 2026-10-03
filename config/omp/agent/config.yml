@@ -83,3 +83,11 @@ commands:
   enableOpencodeProject: true
 speech:
   enabled: false
+mcp:
+  notifications: false
+error:
+  notify: "off"
+completion:
+  notify: "off"
+ask:
+  notify: "off"
