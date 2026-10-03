@@ -12,7 +12,6 @@
     "terminalfont",
     "cpu",
     "memory",
-    "physicaldisk",
     "swap",
     {
       "type": "disk",
