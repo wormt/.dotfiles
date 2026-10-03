@@ -1,12 +1,11 @@
-providers:
-  webSearchOrder:
-    []
 modelRoles:
   smol: llama.cpp/qwen3.8-27b
   plan: kimi-code/k3
   task: kimi-code/k3-256k
-  default: kimi-code/k3-256k
   slow: kimi-code/k3:high
+  default: kimi-code/k3
+  tiny: llama.cpp/qwen3.8-27b
+  judge: openrouter/~typesafe/jev-latest
 symbolPreset: ascii
 composer:
   shape: borderless
@@ -38,6 +37,7 @@ display:
 steeringMode: one-at-a-time
 task:
   showResolvedModelBadge: true
+  eager: default
 astGrep:
   enabled: true
 github:
@@ -48,13 +48,12 @@ terminal:
   showProgress: true
 prewalk:
   enabled: false
-stt:
-  modelName: parakeet
-hideThinkingBlock: true
+hideThinkingBlock: false
 disabledExtensions:
   []
 dev:
   autoqaConsent: granted
+  autoqa: false
 defaultThinkingLevel: auto
 retry:
   fallbackChains:
@@ -64,3 +63,23 @@ bash:
   allowCompoundCommands: true
 python:
   kernelMode: session
+speechgen:
+  enabled: false
+compaction:
+  methodOrder:
+    - remote
+    - handoff
+    - snapcompact
+    - shake
+    - soft
+  thresholdPercent: 85
+lsp:
+  formatOnWrite: true
+bashInterceptor:
+  enabled: false
+tools:
+  xdevDocs: builtins
+commands:
+  enableOpencodeProject: true
+speech:
+  enabled: false
