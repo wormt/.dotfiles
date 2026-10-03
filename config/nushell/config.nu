@@ -49,17 +49,17 @@ $env.LLAMA_CPP_BASE_URL = 'http://192.168.0.91:30080'
 # https://github.com/jlcrochet/fast-completer
 # $env.config.completions.external = {
 #     enable: true
-#     completer: {|spans|
-#         match $spans.0 {
+#     completer: {|place|
+#         match $place.0 {
 #             az | aws | gcloud | gh => {
-#                 let completions = ^fast-completer --add-space --full-commands tsv ...$spans
+#                 let completions = ^fast-completer --add-space --full-commands tsv ...$place.command
 #                 if ($completions | is-not-empty) {
 #                     $completions | lines | split column -n 2 "\t" value description
 #                 }
 #             }
 #             # Optional: fall back to carapace
 #             _ => {
-#                 let completions = ^carapace $spans.0 nushell ...$spans
+#                 let completions = ^carapace $place.0 nushell ...$place.command
 #                 if ($completions | is-not-empty) {
 #                     $completions | from json
 #                 }
@@ -68,15 +68,15 @@ $env.LLAMA_CPP_BASE_URL = 'http://192.168.0.91:30080'
 #     }
 # }
 
-let fish_completer = {|spans|
-    fish --command $"complete '--do-complete=($spans | str replace --all "'" "\\'" | str join ' ')'"
+let fish_completer = {|place|
+    fish --command $"complete '--do-complete=($place.command | str replace --all "'" "\\'" | str join ' ')'"
     | from tsv --flexible --noheaders --no-infer
     | rename value description
     | update value {|row|
       let value = $row.value
       let need_quote = ['\' ',' '[' ']' '(' ')' ' ' '\t' "'" '"' "`"] | any {$in in $value}
       if ($need_quote and ($value | path exists)) {
-        let expanded_path = if ($value starts-with ~) {$value | path expand --no-symlink} else {$value}
+        let expanded_path = if ($value starts-with '~') {$value | path expand --no-symlink} else {$value}
         $'"($expanded_path | str replace --all "\"" "\\\"")"'
       } else {$value}
     }
