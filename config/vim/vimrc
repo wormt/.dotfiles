@@ -874,9 +874,18 @@ endif
 
 packadd! editorconfig
 
-nnoremap <silent> <leader>gl :call ToggleGitLens()<CR>
-
 g:gitgutter_sign_priority = 9
+
+def GutterBase(base: string)
+  g:gitgutter_diff_base = get(g:, 'gitgutter_diff_base', '') ==# base ? '' : base
+  GitGutterAll
+  echo $'gitgutter base: {(g:gitgutter_diff_base ==# '' ? 'index' : g:gitgutter_diff_base)}'
+enddef
+
+nnoremap <silent> <leader>gd <Cmd>GitGutterDiffOrig<CR>
+nnoremap <silent> <leader>gh <ScriptCmd>GutterBase('HEAD~1')<CR>
+nnoremap <silent> <leader>gm <ScriptCmd>GutterBase('main')<CR>
+nnoremap <silent> <leader>gl :call ToggleGitLens()<CR>
 
 g:op_surround_maps = [
     {'map': 'sa(', 'open_delim': '(', 'close_delim': ')', 'action': 'append'},
@@ -909,5 +918,5 @@ g:vim_markdown_conceal = 3
 g:vim_markdown_edit_url_in = 'tab'
 for i in ['follow_anchor', 'conceal_code_blocks', 'math',
           'toml_frontmatter', 'frontmatter', 'strikethrough']
-  g:['vim_markdown_' .. i] = 1
+  g:[$'vim_markdown_{(i)}'] = 1
 endfor
