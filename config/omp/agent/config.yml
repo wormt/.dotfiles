@@ -91,3 +91,4 @@ completion:
   notify: "off"
 ask:
   notify: "off"
+personality: pragmatic
