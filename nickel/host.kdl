@@ -17,6 +17,11 @@ configs {
     output "~/.config/alacritty/alacritty.toml"
     format "toml"
   }
+  ghostty {
+    src "ghostty.ncl"
+    output "~/.config/ghostty/config"
+    format "text"
+  }
   gsettings {
     src "gsettings.ncl"
     output "../config/dconf/dump.dconf"
