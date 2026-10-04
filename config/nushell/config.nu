@@ -26,7 +26,6 @@ $env.LANG = "en_US.UTF-8"
 $env.XKB_DEFAULT_MODEL = "pc104"
 $env.XKB_DEFAULT_LAYOUT = "us"
 $env.RLIMIT_RTPRIO = "88"
-
 $env.PATH = $env.PATH | prepend [($env.HOME + "/.local/bin"),"/home/linuxbrew/.linuxbrew/bin",($env.HOME + "/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/"),($env.HOME + "/.cargo/bin"),($env.HOME + "/.dotnet/tools"),($env.HOME + "/.local/share/fnm/node-versions/lts/installation/bin"),($env.HOME + "/.deno/bin")] | uniq
 if 'DEVSHELL_DIR' in $env {
   $env.PATH = ($env.PATH | prepend $"($env.DEVSHELL_DIR)/bin")
@@ -142,5 +141,7 @@ def curlbash [...args] {
 
 let osrelease = (open /etc/os-release | parse --regex '(?P<key>[^=]*)=(?P<value>.*$)' | transpose -r )
 
-overlay use "~/.py_env/bin/activate.nu"
+# overlay use "~/.py_env/bin/activate.nu"
 #overlay use "~/.config/nushell/nupm/nupm" --prefix
+mkdir ($nu.data-dir | path join "vendor/autoload")
+^mise activate nu | save -f ($nu.data-dir | path join "vendor/autoload/mise.nu")
