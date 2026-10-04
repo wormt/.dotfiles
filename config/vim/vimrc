@@ -33,6 +33,7 @@ set directory=~/.cache/vim/swap
 set undodir=~/.cache/vim/undo
 set autoread
 set path+=**
+set shell=/bin/sh
 set wildmenu
 set wildmode=longest:full,full
 set title
