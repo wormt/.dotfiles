@@ -862,6 +862,11 @@ augroup lsp_filetypes
   au BufRead,BufNewFile *.pkr.json setlocal filetype=json
 augroup END
 
+nnoremap <F5> :make<CR>
+nnoremap <F6> :copen<CR>
+nnoremap ]q :cnext<CR>
+nnoremap [q :cprev<CR>
+
 # YamlFormat has its own conditional logic, so always turn on these aus :)
 augroup yaml_fmt
   au!
