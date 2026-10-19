@@ -48,9 +48,8 @@ terminal:
   showProgress: true
 prewalk:
   enabled: false
-hideThinkingBlock: false
-disabledExtensions:
-  []
+hideThinkingBlock: true
+disabledExtensions: []
 dev:
   autoqaConsent: granted
   autoqa: false
@@ -59,6 +58,10 @@ retry:
   fallbackChains:
     llama.cpp/*:
       - kimi-code/k3-256k
+    kimi-code/*:
+      - openrouter/deepseek/deepseek-v4.1-flash
+    openrouter/*:
+      - llama.cpp/qwen3.8-27b
 bash:
   allowCompoundCommands: true
 python:
