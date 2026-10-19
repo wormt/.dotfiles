@@ -34,7 +34,7 @@ def pomf-upload [endpoint: string, file: path] {
 
 export def upload [
     file: path
-    --target(-t): string = "catbox"
+    --target(-t): string = "pomf"
     --expiry(-e): string = "24h"
     --clip(-c)
 ] {

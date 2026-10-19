@@ -35,6 +35,7 @@ history.txt
 
 # mpd
 playlists/
+config/mpd/sticker.sql
 
 # aerc
 accounts.conf
