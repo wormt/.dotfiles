@@ -1,146 +1,308 @@
-#!/usr/bin/env bash
+#!/bin/sh
 #
-# vim-open [--list] [--edit] [--force] [--any-workspace] [-p PANE] FILE[:LINE[:COL]]
+# vim-open [--list] [--edit] [--force] [--new] [--no-new] [--any-session]
+#          [-p PANE] FILE[:LINE[:COL]]
 #
-# Open a file in the Vim already running inside a herdr pane, instead of
-# spawning a new editor. herdr has no "run a command in this pane's vim"
+# Open a file in the Vim already running inside a tmux pane, instead of
+# spawning a new editor. tmux has no "run a command in that pane's vim"
 # channel, so this drives Vim's own command line through pane input:
 # Escape, then `:execute 'tabedit' fnameescape('<path>')` (+ `:call cursor()`
-# when a line is given). Escaping is Vim's own, so spaces, %, #, |, ", \
-# and single quotes all survive.
+# when a line is given). Escaping is Vim's own, so spaces, %, #, |, ",
+# backslashes, and single quotes all survive.
 #
 # It opens a NEW TAB by default, so the session you are in keeps its window
 # layout and buffers. It does send Escape first, so an in-progress cmdline,
 # visual selection, or pending operator is cancelled.
 #
-# Targets the caller's workspace only; a vim in another workspace is a
-# different screen, so it must be named with -p (or --any-workspace).
+# Targets the caller's tmux session first; a vim in another session is a
+# different screen, so it must be named with -p (or --any-session).
 #
-# Needs $HERDR_ENV=1 (run from inside a herdr pane) and `jq`.
+# When no pane anywhere is running vim, it falls back to a new Ghostty tab
+# (then window, then instance) running vim, if Ghostty is installed -- probed
+# with `ghostty +list-actions`. Without Ghostty it exits non-zero and prints
+# the path: it never starts an editor in the caller's own pane, which would
+# block an agent's shell.
+#
+# POSIX sh; needs a reachable tmux server for the pane path. No jq.
 
-set -euo pipefail
+set -eu
 
 list_only=0
 in_place=0
 force=0
-any_workspace=0
-pane="${HERDR_VIM_PANE:-}"
+any_session=0
+force_new=0
+allow_spawn=1
+pane="${VIM_OPEN_PANE:-}"
 
 while [ $# -gt 0 ]; do
   case "$1" in
     --list|-l) list_only=1; shift ;;
     --edit|-e) in_place=1; shift ;;
     --force) force=1; shift ;;
-    --any-workspace) any_workspace=1; shift ;;
-    -p|--pane) pane="${2:?--pane needs a pane id}"; shift 2 ;;
+    --new) force_new=1; shift ;;
+    --no-new) allow_spawn=0; shift ;;
+    --any-session) any_session=1; shift ;;
+    -p|--pane)
+      [ $# -ge 2 ] || { echo "vim-open: --pane needs a pane id" >&2; exit 2; }
+      pane="$2"; shift 2 ;;
     --) shift; break ;;
     -*) echo "vim-open: unknown option: $1" >&2; exit 2 ;;
     *) break ;;
   esac
 done
 
-if [ "$list_only" -eq 0 ]; then
-  target="${1:?usage: vim-open [--list] [--edit] [--force] [--any-workspace] [-p PANE] FILE[:LINE[:COL]]}"
+if [ "${force_new}" -eq 1 ] && [ "${allow_spawn}" -eq 0 ]; then
+  echo "vim-open: --new and --no-new are mutually exclusive" >&2
+  exit 2
+fi
+
+target=""
+if [ "${list_only}" -eq 0 ]; then
+  [ $# -gt 0 ] || { echo "usage: vim-open [--list] [--edit] [--force] [--new] [--no-new] [--any-session] [-p PANE] FILE[:LINE[:COL]]" >&2; exit 2; }
   [ $# -gt 1 ] && { echo "vim-open: too many arguments" >&2; exit 2; }
-else
-  target=""
+  target="$1"
 fi
 
-herdr="${HERDR_BIN_PATH:-herdr}"
-file=""; line=""; col=""
-
-if [ "$list_only" -eq 0 ]; then
-  # Split the optional :LINE[:COL] suffix, but only when the tail is numeric so
-  # paths containing colons still work.
-  file="$target"
-  if [[ "$target" =~ ^(.*):([0-9]+):([0-9]+)$ ]]; then
-    file="${BASH_REMATCH[1]}"; line="${BASH_REMATCH[2]}"; col="${BASH_REMATCH[3]}"
-  elif [[ "$target" =~ ^(.*):([0-9]+)$ ]]; then
-    file="${BASH_REMATCH[1]}"; line="${BASH_REMATCH[2]}"
-  fi
-  file="$(realpath -e -- "$file")" || { echo "vim-open: no such file: $target" >&2; exit 1; }
-fi
+# Unit separator: safe against spaces and | in paths, pane ids, session names.
+sep=$(printf '\037')
 
 # Vim foreground process names, same matcher vim-tmux-navigator uses.
 vim_re='^g?(view|l?n?vim?x?)(diff)?$'
 
 pane_foreground() {
-  "$herdr" pane process-info --pane "$1" 2>/dev/null \
-    | jq -r '[.result.process_info.foreground_processes[]?.name | ascii_downcase] | .[0] // ""' 2>/dev/null || true
+  tmux display-message -p -t "$1" '#{pane_current_command}' 2>/dev/null \
+    | tr '[:upper:]' '[:lower:]' || true
 }
 
 pane_is_vim() {
-  printf '%s' "$(pane_foreground "$1")" | grep -Eq "$vim_re"
+  pane_foreground "$1" | grep -Eq "${vim_re}"
 }
 
-pane_is_focused() {
-  [ "$("$herdr" pane get "$1" | jq -r '.result.pane.focused' 2>/dev/null)" = "true" ]
-}
-
-# One `herdr pane list` (no --workspace) covers every workspace; the caller's
-# workspace sorts first, then a focused pane, then layout order.
+# One `list-panes -a` per call, ranked: the pane the user is actually looking
+# at first, then the rest of their session, then other sessions. Emits
+# RANK<sep>PANE<sep>SESSION.
 list_candidates() {
-  local workspace="$1" same="" other="" focused="" rest=""
-  for candidate in $("$herdr" pane list | jq -r '.result.panes[].pane_id'); do
-    pane_is_vim "$candidate" || continue
-    if [ "${candidate%%:*}" = "$workspace" ]; then
-      if pane_is_focused "$candidate"; then focused="$focused $candidate"; else same="$same $candidate"; fi
-    else
-      other="$other $candidate"
-    fi
-  done
-  printf '%s\n%s\n%s\n' "$focused" "$same" "$other" | tr ' ' '\n' | grep -v '^$' || true
+  command -v tmux >/dev/null 2>&1 || return 0
+  tmux list-panes -a -F \
+    "#{pane_id}${sep}#{pane_current_command}${sep}#{session_name}${sep}#{window_active}${sep}#{pane_active}" \
+    2>/dev/null \
+  | while IFS="${sep}" read -r vo_id vo_cmd vo_sess vo_wactive vo_pactive; do
+      printf '%s' "${vo_cmd}" | tr '[:upper:]' '[:lower:]' | grep -Eq "${vim_re}" || continue
+      vo_rank=2
+      if [ -n "${1:-}" ] && [ "${vo_sess}" = "$1" ]; then
+        if [ "${vo_wactive}" = "1" ] && [ "${vo_pactive}" = "1" ]; then
+          vo_rank=0
+        else
+          vo_rank=1
+        fi
+      fi
+      printf '%s%s%s%s%s\n' "${vo_rank}" "${sep}" "${vo_id}" "${sep}" "${vo_sess}"
+    done \
+  | sort -s -k1,1n || true
 }
 
-if [ "$list_only" -eq 1 ]; then
-  list_candidates "${HERDR_WORKSPACE_ID:-}"
+pick_editor() {
+  for vo_c in nvim vim vi; do
+    command -v "${vo_c}" >/dev/null 2>&1 && { printf '%s' "${vo_c}"; return 0; }
+  done
+  return 1
+}
+
+# `ghostty +list-actions` is the capability probe: it only exits 0 on a
+# working Ghostty CLI. `+help` then says which spawn actions this build has.
+ghostty_ok() {
+  command -v ghostty >/dev/null 2>&1 && ghostty +list-actions >/dev/null 2>&1
+}
+
+ghostty_has_action() {
+  ghostty +help 2>/dev/null | grep -q -- "$1"
+}
+
+# shellcheck disable=SC2310 # pick_editor's failure is the branch condition, not an error
+spawn_new() {
+  if ! vo_editor=$(pick_editor); then
+    echo "vim-open: no tmux pane is running vim and no vim on PATH; the file is at ${vo_file}" >&2
+    exit 1
+  fi
+  if [ -n "${vo_line}" ]; then
+    if [ -n "${vo_col}" ]; then
+      set -- "+call cursor(${vo_line}, ${vo_col})" "${vo_file}"
+    else
+      set -- "+${vo_line}" "${vo_file}"
+    fi
+  else
+    set -- "${vo_file}"
+  fi
+  vo_where=""
+  # shellcheck disable=SC2310 # a failing probe is the expected negative branch
+  if ghostty_ok; then
+    if ghostty_has_action '+new-tab' \
+      && ghostty +new-tab -e "${vo_editor}" "$@" >/dev/null 2>&1; then
+      vo_where="new ghostty tab"
+    elif ghostty_has_action '+new-window' \
+      && ghostty +new-window -e "${vo_editor}" "$@" >/dev/null 2>&1; then
+      vo_where="new ghostty window"
+    elif setsid -f ghostty -e "${vo_editor}" "$@" >/dev/null 2>&1; then
+      vo_where="new ghostty instance"
+    fi
+  fi
+  if [ -z "${vo_where}" ]; then
+    echo "vim-open: no tmux pane is running vim and no ghostty to open one in; the file is at ${vo_file}" >&2
+    exit 1
+  fi
+  printf 'vim-open: %s%s%s%s%s -> %s (%s)\n' \
+    "${vo_file}" "${vo_line:+:}" "${vo_line:-}" "${vo_col:+:}" "${vo_col:-}" "${vo_where}" "${vo_editor}"
+}
+
+vo_file=""
+vo_line=""
+vo_col=""
+if [ "${list_only}" -eq 0 ]; then
+  # Split the optional :LINE[:COL] suffix, but only when the tail is numeric so
+  # paths containing colons still work.
+  vo_file="${target}"
+  case "${target}" in
+    *:*)
+      vo_tail="${target##*:}"
+      case "${vo_tail}" in
+        ''|*[!0-9]*) ;;
+        *)
+          vo_head="${target%:*}"
+          case "${vo_head}" in
+            *:*)
+              vo_mid="${vo_head##*:}"
+              case "${vo_mid}" in
+                ''|*[!0-9]*)
+                  vo_line="${vo_tail}"
+                  vo_file="${vo_head}"
+                  ;;
+                *)
+                  vo_col="${vo_tail}"
+                  vo_line="${vo_mid}"
+                  vo_file="${vo_head%:*}"
+                  ;;
+              esac
+              ;;
+            *)
+              vo_line="${vo_tail}"
+              vo_file="${vo_head}"
+              ;;
+          esac
+          ;;
+      esac
+      ;;
+    *) ;;
+  esac
+  vo_resolved=$(realpath -e -- "${vo_file}" 2>/dev/null) \
+    || { echo "vim-open: no such file: ${target}" >&2; exit 1; }
+  vo_file="${vo_resolved}"
+fi
+
+vo_caller_session=""
+if [ -n "${TMUX_PANE:-}" ]; then
+  vo_caller_session=$(tmux display-message -p -t "${TMUX_PANE}" '#{session_name}' 2>/dev/null || true)
+fi
+
+if [ "${list_only}" -eq 1 ]; then
+  list_candidates "${vo_caller_session}" | cut -d "${sep}" -f2
   exit 0
 fi
 
-if [ -z "$pane" ]; then
-  [ "${HERDR_ENV:-}" = "1" ] || { echo "vim-open: not inside a herdr pane (set HERDR_VIM_PANE or -p to target one)" >&2; exit 1; }
-  workspace="${HERDR_WORKSPACE_ID:?HERDR_WORKSPACE_ID is unset}"
-  all_candidates="$(list_candidates "$workspace")"
-  candidates="$(printf '%s\n' "$all_candidates" | grep "^${workspace}:" || true)"
-  if [ -z "$candidates" ]; then
-    if [ -n "$all_candidates" ] && [ "$any_workspace" -eq 0 ]; then
-      echo "vim-open: no vim in workspace $workspace; other workspaces have: $(printf '%s' "$all_candidates" | tr '\n' ' ')" >&2
-      echo "vim-open: re-run with -p <pane> to hand it to one of those (a different workspace is a different screen)" >&2
-      exit 1
-    fi
-    [ "$any_workspace" -eq 1 ] && candidates="$all_candidates"
-  fi
-  [ -n "$candidates" ] || { echo "vim-open: no herdr pane is running vim" >&2; exit 1; }
-  pane="$(printf '%s\n' "$candidates" | head -1)"
-  others="$(printf '%s\n' "$candidates" | tail -n +2 | tr '\n' ' ')"
-  [ -n "$others" ] && echo "vim-open: also running vim: $others (override with -p)" >&2
+if [ "${force_new}" -eq 1 ]; then
+  spawn_new
+  exit 0
+fi
+
+vo_send_pane=""
+if [ -n "${pane}" ]; then
+  vo_send_pane="${pane}"
 else
-  # An explicit pane is never trusted blindly: herdr pane input lands in
-  # whatever owns the pane, so a stale or mistyped id would type this command
-  # line into a shell (where Enter runs it) or into an agent's prompt.
-  if ! pane_is_vim "$pane" && [ "$force" -eq 0 ]; then
-    echo "vim-open: $pane is not running vim (foreground: $(pane_foreground "$pane")); pass --force to send anyway" >&2
+  vo_all=$(list_candidates "${vo_caller_session}")
+  if [ -z "${vo_all}" ]; then
+    if [ "${allow_spawn}" -eq 1 ]; then
+      spawn_new
+      exit 0
+    fi
+    echo "vim-open: no tmux pane is running vim; the file is at ${vo_file}" >&2
+    exit 1
+  fi
+
+  vo_same=""
+  vo_other=""
+  while IFS="${sep}" read -r vo_rank vo_id vo_sess; do
+    [ -n "${vo_id}" ] || continue
+    if [ -n "${vo_caller_session}" ] && [ "${vo_sess}" != "${vo_caller_session}" ]; then
+      vo_other="${vo_other} ${vo_id}"
+      continue
+    fi
+    vo_same="${vo_same} ${vo_id}"
+  done <<EOF
+${vo_all}
+EOF
+
+  vo_pick=""
+  if [ -n "${vo_same}" ]; then
+    vo_pick="${vo_same}"
+  elif [ "${any_session}" -eq 1 ]; then
+    vo_pick="${vo_other}"
+  fi
+
+  if [ -z "${vo_pick}" ]; then
+    printf 'vim-open: no vim in session %s; other sessions have:%s\n' \
+      "${vo_caller_session}" "${vo_other}" >&2
+    echo "vim-open: re-run with -p <pane> or --any-session to hand it to one of those (another session is a different screen)" >&2
+    exit 1
+  fi
+
+  if [ -z "${vo_caller_session}" ]; then
+    if [ "${any_session}" -eq 0 ]; then
+      vo_count=$(printf '%s\n' "${vo_pick}" | wc -w | tr -d ' ')
+      if [ "${vo_count}" -gt 1 ]; then
+        printf 'vim-open: not inside tmux and several vim panes exist:%s\n' "${vo_pick}" >&2
+        echo "vim-open: re-run with -p <pane> to pick one" >&2
+        exit 1
+      fi
+    fi
+    echo "vim-open: not inside tmux; using the only vim pane found" >&2
+  fi
+
+  # shellcheck disable=SC2086 # word splitting is the point: one pane id per word
+  set -- ${vo_pick}
+  vo_send_pane="$1"
+  shift
+  [ $# -gt 0 ] && printf 'vim-open: also running vim: %s (override with -p)\n' "$*" >&2
+fi
+
+# An explicit pane is never trusted blindly: tmux send-keys lands in whatever
+# owns the pane, so a stale or mistyped id would type this command line into a
+# shell (where Enter runs it) or into an agent's prompt.
+# shellcheck disable=SC2310 # the refusal branch is the point
+if ! pane_is_vim "${vo_send_pane}"; then
+  if [ "${force}" -eq 0 ]; then
+    # shellcheck disable=SC2312 # informational only: a failed lookup prints an empty foreground
+    echo "vim-open: ${vo_send_pane} is not running vim (foreground: $(pane_foreground "${vo_send_pane}")); pass --force to send anyway" >&2
     exit 1
   fi
 fi
 
 # Vim does the real escaping: a single-quoted Vim string (with ' doubled) fed to
 # fnameescape() survives spaces, %, #, |, ", backslashes, and quotes.
-vim_path="${file//\'/\'\'}"
-"$herdr" pane send-keys "$pane" esc >/dev/null
+vo_vim_path=$(printf '%s' "${vo_file}" | sed "s/'/''/g")
+tmux send-keys -t "${vo_send_pane}" Escape >/dev/null
 # A new tab by default: the user's window layout and buffers stay as they were.
 # --edit reuses the current window, and then Vim refuses with E37 when that
-# buffer has unsaved changes — the tab form is the reliable one.
-if [ "$in_place" -eq 1 ]; then cmd="edit"; else cmd="tabedit"; fi
-"$herdr" pane send-text "$pane" ":execute '$cmd' fnameescape('$vim_path')" >/dev/null
-"$herdr" pane send-keys "$pane" enter >/dev/null
-if [ -n "$line" ]; then
-  if [ -n "$col" ]; then
-    "$herdr" pane send-text "$pane" ":call cursor($line, $col)" >/dev/null
+# buffer has unsaved changes -- the tab form is the reliable one.
+if [ "${in_place}" -eq 1 ]; then vo_cmd="edit"; else vo_cmd="tabedit"; fi
+tmux send-keys -t "${vo_send_pane}" -l ":execute '${vo_cmd}' fnameescape('${vo_vim_path}')" >/dev/null
+tmux send-keys -t "${vo_send_pane}" Enter >/dev/null
+if [ -n "${vo_line}" ]; then
+  if [ -n "${vo_col}" ]; then
+    tmux send-keys -t "${vo_send_pane}" -l ":call cursor(${vo_line}, ${vo_col})" >/dev/null
   else
-    "$herdr" pane send-text "$pane" ":call cursor($line, 1)" >/dev/null
+    tmux send-keys -t "${vo_send_pane}" -l ":call cursor(${vo_line}, 1)" >/dev/null
   fi
-  "$herdr" pane send-keys "$pane" enter >/dev/null
+  tmux send-keys -t "${vo_send_pane}" Enter >/dev/null
 fi
 
-echo "vim-open: $file${line:+:$line}${col:+:$col} -> $pane"
+echo "vim-open: ${vo_file}${vo_line:+:${vo_line}}${vo_col:+:${vo_col}} -> ${vo_send_pane}"
