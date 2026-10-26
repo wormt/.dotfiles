@@ -7,7 +7,7 @@ modelRoles:
   advisor: llama.cpp/gemma-4-12B-it-qat-UD-Q4_K_XL
   smol: llama.cpp/gemma-4-12B-it-qat-UD-Q4_K_XL
   web: web/parallel
-  default: opencode-go/deepseek-v4.1-flash
+  default: kimi-code/kimi-k3
   image: openrouter/qwen/qwen-image-3-pro
   commit: openrouter/inclusionai/ling-3.0-flash:off
   tiny: openrouter/inclusionai/ling-3.0-flash:off
@@ -67,7 +67,7 @@ terminal:
   showProgress: true
 prewalk:
   enabled: false
-hideThinkingBlock: false
+hideThinkingBlock: true
 disabledExtensions: []
 dev:
   autoqaConsent: granted
@@ -98,11 +98,11 @@ speechgen:
 compaction:
   methodOrder:
     - remote
-    - handoff
-    - snapcompact
-    - shake
     - soft
+    - handoff
+    - shake
   thresholdPercent: 85
+  handoffSaveToDisk: true
 lsp:
   formatOnWrite: true
 bashInterceptor:
