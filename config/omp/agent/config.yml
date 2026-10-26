@@ -1,11 +1,18 @@
 modelRoles:
-  smol: llama.cpp/qwen3.8-27b
-  plan: kimi-code/k3
-  task: kimi-code/k3-256k
-  slow: kimi-code/k3:high
-  default: kimi-code/k3
-  tiny: llama.cpp/qwen3.8-27b
-  judge: openrouter/~typesafe/jev-latest
+  plan: opencode-go/deepseek-v4.1-flash
+  task: opencode-go/deepseek-v4.1-flash
+  slow: kimi-code/k3-256k
+  judge: openrouter/cloudflare/clef-flash
+  vision: opencode-go/deepseek-v4.1-flash
+  advisor: llama.cpp/gemma-4-12B-it-qat-UD-Q4_K_XL
+  smol: llama.cpp/gemma-4-12B-it-qat-UD-Q4_K_XL
+  web: web/parallel
+  default: opencode-go/deepseek-v4.1-flash
+  image: openrouter/qwen/qwen-image-3-pro
+  commit: openrouter/inclusionai/ling-3.0-flash:off
+  tiny: openrouter/inclusionai/ling-3.0-flash:off
+  memory: openrouter/inclusionai/ling-3.0-flash:off
+  widget: openrouter/inclusionai/ling-3.0-flash:off
 symbolPreset: ascii
 composer:
   shape: borderless
@@ -15,6 +22,9 @@ theme:
 setupVersion: 2
 memory:
   backend: sharpshooter
+sharpshooter:
+  injectionTokenLimit: 4000
+  model: openrouter/inclusionai/ling-3.0-flash
 autolearn:
   enabled: true
 edit:
@@ -29,6 +39,10 @@ statusLine:
 tui:
   textSizing: false
   vimMode: true
+  titleSpinner: line
+  reactions: false
+  renderSvg: false
+  tight: true
 display:
   showTurnTime: true
   showTokenUsage: true
@@ -38,6 +52,11 @@ steeringMode: one-at-a-time
 task:
   showResolvedModelBadge: true
   eager: default
+  maxConcurrency: 6
+  maxRecursionDepth: 1
+  completionProbe: false
+  agentSoftRequestBudget:
+    sonic: 60
 astGrep:
   enabled: true
 github:
@@ -48,7 +67,7 @@ terminal:
   showProgress: true
 prewalk:
   enabled: false
-hideThinkingBlock: true
+hideThinkingBlock: false
 disabledExtensions: []
 dev:
   autoqaConsent: granted
@@ -61,7 +80,15 @@ retry:
     kimi-code/*:
       - openrouter/deepseek/deepseek-v4.1-flash
     openrouter/*:
-      - llama.cpp/qwen3.8-27b
+      - llama.cpp/gemma-4-12B-it-qat-UD-Q4_K_XL
+    opencode-go/*:
+      - kimi-code/k3-256k
+  fallbackOn: usage-limit
+  fallbackRevertPolicy: never
+  modelFallback: true
+providers:
+  maxInFlightRequests:
+    llama.cpp: 4
 bash:
   allowCompoundCommands: true
 python:
@@ -81,7 +108,7 @@ lsp:
 bashInterceptor:
   enabled: false
 tools:
-  xdevDocs: builtins
+  xdevDocs: catalog
 commands:
   enableOpencodeProject: true
 speech:
@@ -94,4 +121,14 @@ completion:
   notify: "off"
 ask:
   notify: "off"
-personality: pragmatic
+personality: default
+title:
+  refreshOnReplan: false
+  icons: boring
+magicKeywords:
+  ultrathink: false
+startup:
+  quiet: true
+  changelogMode: expanded
+marketplace:
+  autoUpdate: "off"
