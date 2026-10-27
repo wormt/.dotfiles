@@ -790,7 +790,7 @@ def RegisterLspServers()
   endif
 
   if executable('promql-langserver')
-    call add(servers, {'name': 'promql', 'filetype': ['promql'], 'path': 'promql-langserver', 'args': ['--config-file', expand('~/.config/promql-langserver.yaml')]})
+    call add(servers, {'name': 'promql', 'filetype': ['promql'], 'path': 'promql-langserver', 'args': ['--config-file', expand('~/.config/promql-langserver.yml')]})
   endif
 
   if !empty(servers)

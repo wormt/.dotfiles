@@ -1,0 +1,3 @@
+---
+prometheus_url: "http://localhost:8428"
+activate_rpc_log: true
