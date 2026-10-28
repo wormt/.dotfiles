@@ -141,6 +141,15 @@ def curlbash [...args] {
 
 let osrelease = (open /etc/os-release | parse --regex '(?P<key>[^=]*)=(?P<value>.*$)' | transpose -r )
 
+$env.config.hooks.pre_prompt = (
+  $env.config.hooks.pre_prompt? | default [] | append {||
+    if (which direnv | is-empty) {
+      return
+    }
+    direnv export json | from json | default {} | load-env
+  }
+)
+
 # overlay use "~/.py_env/bin/activate.nu"
 #overlay use "~/.config/nushell/nupm/nupm" --prefix
 mkdir ($nu.data-dir | path join "vendor/autoload")

@@ -79,6 +79,7 @@ def PackInit()
   call minpac#add('wormt/lsp', {'frozen': v:true})
   call minpac#add('dense-analysis/ale')
   call minpac#add('nickel-lang/vim-nickel')
+  call minpac#add('chr4/nginx.vim')
 
   #git stuff this shit runs git like every second
   call minpac#add('airblade/vim-gitgutter')
@@ -327,6 +328,7 @@ if executable('ansible-language-server')
     au BufRead,BufNewFile */tasks/*.yml,*/tasks/*.yaml     setlocal filetype=yaml.ansible
     au BufRead,BufNewFile */handlers/*.yml,*/handlers/*.yaml   setlocal filetype=yaml.ansible
     au BufRead,BufNewFile *ansible*/*.yml,*ansible*/*.yaml   setlocal filetype=yaml.ansible
+    au BufRead,BufNewFile */vhosts.d/*.conf set ft=nginx
   augroup END
 endif
 
