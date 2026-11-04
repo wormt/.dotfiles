@@ -1,0 +1,11 @@
+brew "vim"
+brew "tmux"
+brew "fennel"
+brew "rclone"   # no mount on macOS, use nfsmount
+brew "nushell"
+cask "hammerspoon"
+cask "ghostty"
+cask "google-chrome"
+cask "keepassxc"
+cask "bitwarden"
+cask "macfuse"  # gocryptfs needs it
