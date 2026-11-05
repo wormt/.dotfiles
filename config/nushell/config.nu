@@ -26,7 +26,7 @@ $env.LANG = "en_US.UTF-8"
 $env.XKB_DEFAULT_MODEL = "pc104"
 $env.XKB_DEFAULT_LAYOUT = "us"
 $env.RLIMIT_RTPRIO = "88"
-$env.PATH = $env.PATH | prepend [($env.HOME + "/.local/bin"),"/home/linuxbrew/.linuxbrew/bin",($env.HOME + "/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/"),($env.HOME + "/.cargo/bin"),($env.HOME + "/.dotnet/tools"),($env.HOME + "/.local/share/fnm/node-versions/lts/installation/bin"),($env.HOME + "/.deno/bin")] | uniq
+$env.PATH = $env.PATH | prepend [($env.HOME + "/.local/bin"), "/opt/homebrew/bin", "/home/linuxbrew/.linuxbrew/bin",($env.HOME + "/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/"),($env.HOME + "/.cargo/bin"),($env.HOME + "/.dotnet/tools"),($env.HOME + "/.local/share/fnm/node-versions/lts/installation/bin"),($env.HOME + "/.deno/bin"), "/nix/var/nix/profiles/default/bin"] | uniq
 if 'DEVSHELL_DIR' in $env {
   $env.PATH = ($env.PATH | prepend $"($env.DEVSHELL_DIR)/bin")
 }
@@ -156,7 +156,8 @@ def curlbash [...args] {
   }
 }
 
-let osrelease = (open /etc/os-release | parse --regex '(?P<key>[^=]*)=(?P<value>.*$)' | transpose -r )
+# This Linux-specific release metadata is not used by this configuration.
+# let osrelease = (open /etc/os-release | parse --regex '(?P<key>[^=]*)=(?P<value>.*$)' | transpose -r )
 
 $env.config.hooks.pre_prompt = (
   $env.config.hooks.pre_prompt? | default [] | append {||

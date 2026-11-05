@@ -1,12 +1,14 @@
 #theme = Builtin Pastel Dark
 theme = Ayu
 font-family = monospace
-font-size = 10
+font-size = 13
 window-decoration = true
 window-save-state = always
 cursor-style = block
 cursor-style-blink = true
 #command = vim -c "tab terminal nu" -c "1tabclose"
-command = nu
+# macOS login shells do not inherit Homebrew's PATH.
+command = /opt/homebrew/bin/nu --config /Users/ajohnson/.dotfiles/config/nushell/config.nu
 gtk-titlebar-style = tabs
-confirm-close-surface = false
+confirm-close-surface = always
+macos-option-as-alt = true
