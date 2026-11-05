@@ -1,11 +1,13 @@
 ;; super == option
-;; prefix: ctrl+super+b, then hjkl focus, HJKL send to monitor, m/r move/resize.
+;; prefix: ctrl+super+b, then hjkl focus, HJKL send to monitor, m/r move/resize,
+;; arrows snap halves, - = [ ] snap quarters, s shrug, t/T thorn, . ellipsis.
+;; minimize, fill, close: native shortcuts
 
 (local mod [:alt])
 (local mod-shift [:alt :shift])
 
-;; raises windows on focus, so off
-(local focus-follows-mouse false)
+;; macos raises on focus
+(local focus-follows-mouse true)
 
 (set hs.window.animationDuration 0)
 (hs.autoLaunch true)
@@ -120,15 +122,24 @@
         (hs.timer.doEvery 5 (fn [] (when (not (wm-mouse-tap:isEnabled))
                                      (wm-mouse-tap:start)))))
 
+(var hover-dirty false)
+(var hover-last nil)
 (when focus-follows-mouse
   (global wm-focus-tap
-          (: (hs.eventtap.new [T.mouseMoved]
-                              (fn [e]
-                                (let [w (window-at (e:location))
-                                      cur (focused)]
-                                  (when (and w (or (not cur) (not= (w:id) (cur:id))))
-                                    (w:focus)))
-                                false)) :start)))
+          (: (hs.eventtap.new [T.mouseMoved] (fn [] (set hover-dirty true) false)) :start))
+  ;; focus once the pointer has settled
+  (global wm-focus-timer
+          (hs.timer.doEvery 0.1
+                            (fn []
+                              (when hover-dirty
+                                (let [p (hs.mouse.absolutePosition)]
+                                  (if (and hover-last (= hover-last.x p.x) (= hover-last.y p.y))
+                                      (let [w (window-at p)
+                                            cur (focused)]
+                                        (set hover-dirty false)
+                                        (when (and w (or (not cur) (not= (w:id) (cur:id))))
+                                          (w:focus)))
+                                      (set hover-last {:x p.x :y p.y}))))))))
 
 (fn to-monitor [dir]
   (fn []
@@ -218,6 +229,26 @@
       (let [f (w:frame)]
         (hs.mouse.absolutePosition {:x (+ f.x (/ f.w 2)) :y (+ f.y (/ f.h 2))})))))
 
+(fn cycle-window [step]
+  (fn []
+    (let [wins (icollect [_ w (ipairs (hs.window.orderedWindows))]
+                 (when (w:isStandard) w))
+          cur (focused)
+          n (# wins)]
+      (table.sort wins (fn [a b] (< (a:id) (b:id))))
+      (var idx 0)
+      (each [i w (ipairs wins)]
+        (when (and cur (= (w:id) (cur:id))) (set idx i)))
+      (when (> n 0)
+        (let [w (. wins (+ 1 (% (+ idx step -1) n)))
+              f (w:frame)]
+          (w:focus)
+          (hs.mouse.absolutePosition {:x (+ f.x (/ f.w 2)) :y (+ f.y (/ f.h 2))}))))))
+
+(fn toggle-fullscreen []
+  (let [w (focused)]
+    (when w (w:toggleFullScreen))))
+
 (fn focus-window [dir]
   (fn []
     (let [w (focused)]
@@ -241,6 +272,29 @@
 (wm:bind [:shift] :j (send-to-monitor :toSouth))
 (wm:bind [:shift] :k (send-to-monitor :toNorth))
 (wm:bind [:shift] :l (send-to-monitor :toEast))
+(fn snap [item unit]
+  (fn []
+    (let [app (hs.application.frontmostApplication)
+          w (focused)]
+      (when (not (and app (app:selectMenuItem [:Window "Move & Resize" item])))
+        (when w (w:moveToUnit unit))))
+    (wm-leave)))
+
+(wm:bind [] :left (snap "Left" (hs.geometry.rect 0 0 0.5 1)))
+(wm:bind [] :right (snap "Right" (hs.geometry.rect 0.5 0 0.5 1)))
+(wm:bind [] :up (snap "Top" (hs.geometry.rect 0 0 1 0.5)))
+(wm:bind [] :down (snap "Bottom" (hs.geometry.rect 0 0.5 1 0.5)))
+(wm:bind [] "-" (snap "Top Left" (hs.geometry.rect 0 0 0.5 0.5)))
+(wm:bind [] "=" (snap "Top Right" (hs.geometry.rect 0.5 0 0.5 0.5)))
+(wm:bind [] "[" (snap "Bottom Left" (hs.geometry.rect 0 0.5 0.5 0.5)))
+(wm:bind [] "]" (snap "Bottom Right" (hs.geometry.rect 0.5 0.5 0.5 0.5)))
+(fn type-text [text]
+  (fn [] (wm-leave) (hs.eventtap.keyStrokes text)))
+
+(wm:bind [] :s (type-text "\u{AF}\\_(\u{30C4})_/\u{AF}"))
+(wm:bind [] :t (type-text "\u{FE}"))
+(wm:bind [:shift] :t (type-text "\u{DE}"))
+(wm:bind [] "." (type-text "\u{2026}"))
 (wm:bind [] :m (fn [] (wm-leave) (move-mode:enter)))
 (wm:bind [] :r (fn [] (wm-leave) (resize-mode:enter)))
 (wm:bind [] :escape wm-leave)
@@ -254,6 +308,9 @@
         (hs.application.launchOrFocus :Ghostty))))
 
 (hs.hotkey.bind mod :return terminal)
+(hs.hotkey.bind mod :j (cycle-window 1))
+(hs.hotkey.bind mod :k (cycle-window -1))
+(hs.hotkey.bind mod :f toggle-fullscreen)
 (hs.hotkey.bind mod-shift :up (to-monitor :toNorth))
 (hs.hotkey.bind mod-shift :down (to-monitor :toSouth))
 (hs.hotkey.bind mod-shift :left (to-monitor :toWest))
