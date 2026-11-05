@@ -1,13 +1,13 @@
 modelRoles:
-  plan: opencode-go/deepseek-v4.1-flash
-  task: opencode-go/deepseek-v4.1-flash
+  plan: kimi-code/k3-256k
+  task: kimi-code/k3-256k
   slow: kimi-code/k3-256k
   judge: openrouter/cloudflare/clef-flash
-  vision: opencode-go/deepseek-v4.1-flash
+  vision: kimi-code/k3-256k
   advisor: llama.cpp/gemma-4-12B-it-qat-UD-Q4_K_XL
   smol: llama.cpp/gemma-4-12B-it-qat-UD-Q4_K_XL
   web: web/parallel
-  default: kimi-code/kimi-k3
+  default: kimi-code/k3
   image: openrouter/qwen/qwen-image-3-pro
   commit: openrouter/inclusionai/ling-3.0-flash:off
   tiny: openrouter/inclusionai/ling-3.0-flash:off
@@ -67,8 +67,9 @@ terminal:
   showProgress: true
 prewalk:
   enabled: false
-hideThinkingBlock: true
-disabledExtensions: []
+hideThinkingBlock: false
+disabledExtensions:
+  - extension-module:ntfy
 dev:
   autoqaConsent: granted
   autoqa: false

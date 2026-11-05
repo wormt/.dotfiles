@@ -43,7 +43,7 @@ $env.HISTSIZE = 1048576
 
 $env.VIRTUAL_ENV_DISABLE_PROMPT = true
 
-$env.LLAMA_CPP_BASE_URL = 'http://192.168.0.91:8080'
+$env.LLAMA_CPP_BASE_URL = 'http://cherubim.home.arpa:8080'
 
 # https://github.com/jlcrochet/fast-completer
 # $env.config.completions.external = {
@@ -111,6 +111,23 @@ def --wrapped --env az [...args] {
     # ^proxychains4 -q az ...$args
   } else {
     $env.o = (^az ...$args)
+    # $env.o = (^proxychains4 -q az ...$args)
+
+    try {
+      $env.o | from json
+    } catch {
+      $env.o
+    }
+  }
+}
+
+@complete external
+def --wrapped --env kubectl [...args] {
+  if ($args.0 != 'get') {
+    ^kubectl ...$args
+    # ^proxychains4 -q az ...$args
+  } else {
+    $env.o = (^kubectl ...$args -o json)
     # $env.o = (^proxychains4 -q az ...$args)
 
     try {
