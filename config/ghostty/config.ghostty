@@ -12,3 +12,6 @@ command = /opt/homebrew/bin/nu --config /Users/ajohnson/.dotfiles/config/nushell
 gtk-titlebar-style = tabs
 confirm-close-surface = always
 macos-option-as-alt = true
+# allow mac quickterm
+keybind = global:alt+s=toggle_quick_terminal
+quick-terminal-size = 50%

@@ -21,7 +21,7 @@
      :alpha (or alpha 1)}))
 
 (let [style hs.alert.defaultStyle]
-  (set style.fillColor (hex "#1F2430" 0.96))
+  (set style.fillColor (hex "#0F1419" 0.96))
   (set style.strokeColor (hex "#FF8F40"))
   (set style.textColor (hex "#E6E1CF"))
   (set style.strokeWidth 2)

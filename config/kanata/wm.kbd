@@ -1,0 +1,55 @@
+;; tmux-style prefix for gnome
+;; this works by binding things to keys that arent on my keyboard
+;; 
+;; hjkl         focus window          ctrl+alt+shift+super + f13-f16
+;; arrows       move through tiles    ctrl+alt+super       + f13-f16
+;; shift+arrows span into neighbors   ctrl+shift+super     + f13-f16
+;; HJKL         send to monitor       (gnome super+shift+arrows)
+;; s t T .      shrug, thorn, Thorn, ellipsis (compose key, see ~/.XCompose),
+;;              these leave the mode first
+;; esc, b       leave the mode
+
+(defcfg
+  process-unmapped-keys yes)
+
+(defsrc
+  b
+  h j k l
+  left down up right
+  s t .
+  esc)
+
+(defalias
+  off (layer-switch base)
+  ;; ctrl+super are still held when the prefix fires
+  ;; release them so they dont spill into binds
+  pfx (switch
+        ((and lctl lmet)) (multi (release-key lctl) (release-key lmet) (layer-switch wm)) break
+        () b break)
+  fh (switch ((or lsft rsft)) M-left break () C-A-S-M-f13 break)
+  fj (switch ((or lsft rsft)) M-down break () C-A-S-M-f14 break)
+  fk (switch ((or lsft rsft)) M-up break () C-A-S-M-f15 break)
+  fl (switch ((or lsft rsft)) M-right break () C-A-S-M-f16 break)
+  al (switch ((or lsft rsft)) C-S-M-f13 break () C-A-M-f13 break)
+  ad (switch ((or lsft rsft)) C-S-M-f14 break () C-A-M-f14 break)
+  au (switch ((or lsft rsft)) C-S-M-f15 break () C-A-M-f15 break)
+  ar (switch ((or lsft rsft)) C-S-M-f16 break () C-A-M-f16 break)
+  shrug (multi @off (macro ralt s h))
+  ell (multi @off (macro ralt . .))
+  thorn (switch
+          ((or lsft rsft)) (multi @off (macro ralt S-t S-h)) break
+          () (multi @off (macro ralt t h)) break))
+
+(deflayer base
+  @pfx
+  _ _ _ _
+  _ _ _ _
+  _ _ _
+  _)
+
+(deflayer wm
+  @off
+  @fh @fj @fk @fl
+  @al @ad @au @ar
+  @shrug @thorn @ell
+  @off)

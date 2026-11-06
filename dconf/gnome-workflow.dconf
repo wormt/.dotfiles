@@ -1,0 +1,96 @@
+[org/gnome/desktop/wm/preferences]
+focus-mode='sloppy'
+auto-raise=true
+auto-raise-delay=150
+resize-with-right-button=true
+
+[org/gnome/mutter]
+overlay-key=''
+
+[org/gnome/desktop/wm/keybindings]
+close=['<Super>q', '<Alt>F4']
+toggle-fullscreen=['<Super>f']
+switch-input-source=@as []
+switch-input-source-backward=@as []
+
+[org/gnome/shell/extensions/dash-to-panel]
+shortcut=@as []
+shortcut-text=''
+
+[org/gnome/desktop/input-sources]
+xkb-options=['compose:ralt']
+
+[org/gnome/desktop/interface]
+enable-animations=true
+color-scheme='prefer-dark'
+
+[org/gnome/shell/keybindings]
+toggle-quick-settings=@as []
+
+[org/gnome/settings-daemon/plugins/media-keys]
+search=['<Super>space']
+screensaver=['<Super>Pause']
+custom-keybindings=['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/']
+
+[org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0]
+name='ghostty'
+command='ghostty'
+binding='<Super>Return'
+
+[com/github/amezin/ddterm]
+background-color='#0F1419'
+background-opacity=0.8
+bold-color-same-as-fg=true
+command='custom-command'
+cursor-background-color='#E6E1CF'
+cursor-colors-set=true
+cursor-foreground-color='#0F1419'
+custom-command='env nu'
+ddterm-toggle-hotkey=['<Super>s']
+foreground-color='#E6E1CF'
+highlight-background-color='#3E4B59'
+highlight-colors-set=true
+highlight-foreground-color='#E6E1CF'
+palette=['#000000', '#FF3333', '#B8CC52', '#E7C547', '#36A3D9', '#F07178', '#95E6CB', '#FFFFFF', '#5C6773', '#FF3333', '#BBE67E', '#E7C547', '#5CCFE6', '#F07178', '#95E6CB', '#FFFFFF']
+panel-icon-type='none'
+tab-policy='automatic'
+theme-variant='dark'
+transparent-background=true
+use-theme-colors=false
+window-size=0.5
+
+[org/gnome/shell/extensions/tilingshell]
+layouts-json='[{"id":"Layout 3","tiles":[{"x":0,"y":0,"width":0.33,"height":1,"groups":[1]},{"x":0.33,"y":0,"width":0.67,"height":1,"groups":[1]}]},{"id":"Layout 4","tiles":[{"x":0,"y":0,"width":0.67,"height":1,"groups":[1]},{"x":0.67,"y":0,"width":0.33,"height":1,"groups":[1]}]},{"id":"7182385","tiles":[{"x":0,"y":0,"width":0.4876302083333333,"height":0.5,"groups":[1,2]},{"x":0.4876302083333333,"y":0,"width":0.5123697916666666,"height":1,"groups":[1]},{"x":0,"y":0.5,"width":0.4876302083333333,"height":0.5,"groups":[2,1]}]},{"id":"Quarters","tiles":[{"x":0,"y":0,"width":0.5,"height":0.5,"groups":[1,2]},{"x":0.5,"y":0,"width":0.5,"height":0.5,"groups":[1,2]},{"x":0,"y":0.5,"width":0.5,"height":0.5,"groups":[1,2]},{"x":0.5,"y":0.5,"width":0.5,"height":0.5,"groups":[1,2]}]},{"id":"7368536","tiles":[{"x":0,"y":0,"width":0.5631510416666666,"height":1,"groups":[1]},{"x":0.5631510416666666,"y":0,"width":0.43684895833333337,"height":0.5020833333333333,"groups":[2,1]},{"x":0.5631510416666666,"y":0.5020833333333333,"width":0.21549479166666674,"height":0.4979166666666667,"groups":[2,3,1]},{"x":0.7786458333333334,"y":0.5020833333333333,"width":0.22135416666666663,"height":0.24687499999999996,"groups":[2,4,3]},{"x":0.7786458333333334,"y":0.7489583333333333,"width":0.22135416666666663,"height":0.2510416666666667,"groups":[4,3]}]}]'
+cycle-layouts-backward=['<Shift>']
+edge-tiling-mode='default'
+edge-tiling-offset=uint32 32
+enable-blur-selected-tilepreview=false
+enable-screen-edges-windows-suggestions=false
+enable-snap-assistant-windows-suggestions=false
+enable-tiling-system-windows-suggestions=false
+enable-window-border=true
+focus-window-down=['<Control><Alt><Shift><Super>XF86Launch5']
+focus-window-left=['<Control><Alt><Shift><Super>XF86Tools']
+focus-window-next=['<Super>j']
+focus-window-prev=['<Super>k']
+focus-window-right=['<Control><Alt><Shift><Super>XF86Launch7']
+focus-window-up=['<Control><Alt><Shift><Super>XF86Launch6']
+inner-gaps=uint32 4
+move-window-down=['<Control><Alt><Super>XF86Launch5']
+move-window-left=['<Control><Alt><Super>XF86Tools']
+move-window-right=['<Control><Alt><Super>XF86Launch7']
+move-window-up=['<Control><Alt><Super>XF86Launch6']
+outer-gaps=uint32 4
+overridden-settings="{\"org.gnome.mutter.keybindings\":{\"toggle-tiled-right\":\"@as []\",\"toggle-tiled-left\":\"@as []\"},\"org.gnome.desktop.wm.keybindings\":{\"maximize\":\"['<Super>Up']\",\"unmaximize\":\"['<Super>Down', '<Alt>F5']\"},\"org.gnome.mutter\":{\"edge-tiling\":\"false\"}}"
+quarter-tiling-threshold=uint32 32
+selected-layouts=[['Layout 3', '7368536', '7182385'], ['Layout 3', 'Layout 2', 'Quarters']]
+show-indicator=true
+snap-assistant-animation-time=uint32 0
+snap-assistant-threshold=50
+span-window-down=['<Control><Shift><Super>XF86Launch5']
+span-window-left=['<Control><Shift><Super>XF86Tools']
+span-window-right=['<Control><Shift><Super>XF86Launch7']
+span-window-up=['<Control><Shift><Super>XF86Launch6']
+tile-preview-animation-time=uint32 0
+window-border-width=uint32 3
+window-use-custom-border-color=false
